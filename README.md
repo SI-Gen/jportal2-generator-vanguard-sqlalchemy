@@ -70,13 +70,13 @@ KEY UKEY_UNIQUEINT_REF UNIQUE UniqueInt
 PROC SelectOne
 PROC Update
 
-         PROC SelectByStandardString
-         INPUT
-         StandardString  =
-         OUTPUT
-         ID       =
-         IntField =
-         TMStamp  =
+PROC SelectByStandardString
+INPUT
+     StandardString  =
+OUTPUT
+     ID       =
+     IntField =
+     TMStamp  =
 
 ```
 
