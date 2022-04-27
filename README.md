@@ -1,4 +1,4 @@
-# jportal2-generator-vanguardg-sqlalchemy
+# jportal2-generator-vanguard-sqlalchemy
 This is a JPortal2 generator that generates SQLAlchemy-based database access for the Vanguard framework
 
 Usage:
