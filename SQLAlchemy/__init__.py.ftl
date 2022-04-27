@@ -3,14 +3,14 @@
 ################## Generated Code. DO NOT CHANGE THIS CODE. Change it in the generator and regenerate ##################
 ########################################################################################################################
 <#list database.getTables() as table>
-    from .db_${table.getName()} import DB_${table.getName()}
-    <#list table.getProcs() as proc>
-        <#if !proc.isStdExtended() && !proc.isSProc() && proc.name != "">
-            <#if proc.lines?size gt 0>
-                from .db_${table.getName()} import DB_${table.getName()}${proc.name}
-            </#if>
-        </#if>
-    </#list>
+from .db_${table.getName()} import DB_${table.getName()}
+<#list table.getProcs() as proc>
+<#--<#if !proc.isStdExtended() && !proc.isSProc() && proc.name != "">-->
+<#--    <#if proc.lines?size gt 0>-->
+from .db_${table.getName()} import DB_${table.getName()}${proc.name}
+<#--    </#if>-->
+<#--</#if>-->
+</#list>
 </#list>
 
 ALL_TABLES = [
@@ -22,11 +22,10 @@ ALL_TABLES = [
 ALL_PROCS = [
 <#list database.getTables() as table>
     <#list table.getProcs() as proc>
-        <#if !proc.isStdExtended() && !proc.isSProc() && proc.name != "">
-            <#if proc.lines?size gt 0>
-                DB_${table.getName()}${proc.name},
-            </#if>
-        </#if>
+<#if !proc.isBuiltIn() || database.flags?seq_contains("SQLAlchemy.generateBuiltIns")>
+    DB_${table.getName()}${proc.name},
+<#--            </#if>-->
+</#if>
     </#list>
 </#list>
 ]
@@ -41,7 +40,7 @@ __all__ = [
     <#list table.getProcs() as proc>
         <#if !proc.isStdExtended() && !proc.isSProc() && proc.name != "">
             <#if proc.lines?size gt 0>
-                "DB_${table.getName()}${proc.name}",
+    "DB_${table.getName()}${proc.name}",
             </#if>
         </#if>
     </#list>

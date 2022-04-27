@@ -4,64 +4,66 @@
 ########################################################################################################################
 
 <#function getSQLAlchemyColumnType field>
-    <#if field.type?c == '1'><#return "Binary()">
-    <#elseif field.type?c == '2'><#return "Boolean()">
-    <#elseif field.type?c == '3'><#return "SmallInteger()">
-    <#elseif field.type?c == '4'><#return "String(length=#{field.length; M0})">
-    <#elseif field.type?c == '5'><#return "DateTime()">
-    <#elseif field.type?c == '6'><#return "DateTime()">
-    <#elseif field.type?c == '7'><#return "Numeric(precision=${field.precision}, scale=${field.scale})">
-    <#elseif field.type?c == '9'><#return "Float(precision=${field.precision})">
-    <#elseif field.type?c == '10'><#return "Integer()">
-    <#elseif field.type?c == '11'><#return "Integer()">
-    <#elseif field.type?c == '12'><#return "BigInteger()">
-    <#elseif field.type?c == '13'><#return "Numeric(precision=${field.precision}, scale=${field.scale})">
-    <#elseif field.type?c == '14'><#return "Integer()">
-    <#elseif field.type?c == '15'><#return "SmallInteger()">
-    <#elseif field.type?c == '17'><#return "DateTime()">
-    <#elseif field.type?c == '18'><#return "DateTime()">
-    <#elseif field.type?c == '19'><#return "Binary()">
-    <#elseif field.type?c == '20'><#return "DateTime()">
-    <#elseif field.type?c == '21'><#return "String(length=#{field.length; M0})">
-    <#elseif field.type?c == '23'><#return "String(length=#{field.length; M0})">
-    <#elseif field.type?c == '24'><#return "BigInteger()">
-    <#elseif field.type?c == '25'><#return "BigInteger()">
-    <#elseif field.type?c == '26'><#return "DateTime()">
-    <#elseif field.type?c == '27'><#return "Unicode(length=#{field.length; M0})">
-    <#elseif field.type?c == '28'><#return "Unicode(#{field.length; M0})">
-    <#elseif field.type?c == '29'><#return "Unicode(#{field.length; M0})">
-    <#elseif field.type?c == '30'><#return "String(length=#{field.length; M0})">
+    <#if field.type?c == '1'><#return "sa.Binary()">
+    <#elseif field.type?c == '2'><#return "db_types.Boolean()">
+    <#elseif field.type?c == '3'><#return "sa.SmallInteger()">
+    <#elseif field.type?c == '4' && field.isNull()><#return "sa.String(length=#{field.length; M0})">
+    <#elseif field.type?c == '4'><#return "db_types.NonNullableString(length=#{field.length; M0})">
+    <#elseif field.type?c == '5'><#return "sa.DateTime()">
+    <#elseif field.type?c == '6'><#return "sa.DateTime()">
+    <#elseif field.type?c == '7'><#return "sa.Numeric(precision=${field.precision}, scale=${field.scale})">
+    <#elseif field.type?c == '9'><#return "sa.Float(precision=${field.precision})">
+    <#elseif field.type?c == '10'><#return "sa.Integer()">
+    <#elseif field.type?c == '11'><#return "sa.Integer()">
+    <#elseif field.type?c == '12'><#return "sa.BigInteger()">
+    <#elseif field.type?c == '13'><#return "sa.Numeric(precision=${field.precision}, scale=${field.scale})">
+    <#elseif field.type?c == '14'><#return "sa.Integer()">
+    <#elseif field.type?c == '15'><#return "sa.SmallInteger()">
+    <#elseif field.type?c == '17'><#return "sa.DateTime()">
+    <#elseif field.type?c == '18'><#return "sa.DateTime()">
+    <#elseif field.type?c == '19'><#return "sa.Binary()">
+    <#elseif field.type?c == '20'><#return "sa.DateTime()">
+    <#elseif field.type?c == '21'><#return "sa.String(length=#{field.length; M0})">
+    <#elseif field.type?c == '23'><#return "sa.String(length=#{field.length; M0})">
+    <#elseif field.type?c == '24'><#return "sa.BigInteger()">
+    <#elseif field.type?c == '25'><#return "sa.BigInteger()">
+    <#elseif field.type?c == '26'><#return "sa.DateTime()">
+    <#elseif field.type?c == '27'><#return "sa.Unicode(length=#{field.length; M0})">
+    <#elseif field.type?c == '28'><#return "sa.Unicode(#{field.length; M0})">
+    <#elseif field.type?c == '29'><#return "sa.Unicode(#{field.length; M0})">
+    <#elseif field.type?c == '30'><#return "sa.String(length=#{field.length; M0})">
     <#else><#return "String(100)">
     </#if>>
 </#function>
 <#function getSQLAlchemyBaseType field>
-    <#if field.type?c == '1'><#return "Binary">
-    <#elseif field.type?c == '2'><#return "Boolean">
-    <#elseif field.type?c == '3'><#return "SmallInteger">
-    <#elseif field.type?c == '4'><#return "String">
-    <#elseif field.type?c == '5'><#return "DateTime">
-    <#elseif field.type?c == '6'><#return "DateTime">
-    <#elseif field.type?c == '7'><#return "Numeric">
-    <#elseif field.type?c == '9'><#return "Float">
-    <#elseif field.type?c == '10'><#return "Integer">
-    <#elseif field.type?c == '11'><#return "Integer">
-    <#elseif field.type?c == '12'><#return "BigInteger">
-    <#elseif field.type?c == '13'><#return "Numeric">
-    <#elseif field.type?c == '14'><#return "Integer">
-    <#elseif field.type?c == '15'><#return "SmallInteger">
-    <#elseif field.type?c == '17'><#return "DateTime">
-    <#elseif field.type?c == '18'><#return "DateTime">
-    <#elseif field.type?c == '19'><#return "Binary">
-    <#elseif field.type?c == '20'><#return "DateTime">
-    <#elseif field.type?c == '21'><#return "String">
-    <#elseif field.type?c == '23'><#return "String">
-    <#elseif field.type?c == '24'><#return "BigInteger">
-    <#elseif field.type?c == '25'><#return "BigInteger">
-    <#elseif field.type?c == '26'><#return "DateTime">
-    <#elseif field.type?c == '27'><#return "Unicode">
-    <#elseif field.type?c == '28'><#return "Unicode">
-    <#elseif field.type?c == '29'><#return "Unicode">
-    <#elseif field.type?c == '30'><#return "String">
+    <#if field.type?c == '1'><#return "sa.types.Binary">
+    <#elseif field.type?c == '2'><#return "db_types.Boolean">
+    <#elseif field.type?c == '3'><#return "sa.types.SmallInteger">
+    <#elseif field.type?c == '4' && field.isNull()><#return "sa.types.String">
+    <#elseif field.type?c == '4'><#return "db_types.NonNullableString">
+    <#elseif field.type?c == '5'><#return "sa.types.DateTime">
+    <#elseif field.type?c == '6'><#return "sa.types.DateTime">
+    <#elseif field.type?c == '7'><#return "sa.types.Numeric">
+    <#elseif field.type?c == '9'><#return "sa.types.Float">
+    <#elseif field.type?c == '10'><#return "sa.types.Integer">
+    <#elseif field.type?c == '11'><#return "sa.types.Integer">
+    <#elseif field.type?c == '12'><#return "sa.types.BigInteger">
+    <#elseif field.type?c == '13'><#return "sa.types.Numeric">
+    <#elseif field.type?c == '14'><#return "sa.types.Integer">
+    <#elseif field.type?c == '15'><#return "sa.types.SmallInteger">
+    <#elseif field.type?c == '17'><#return "sa.types.DateTime">
+    <#elseif field.type?c == '18'><#return "sa.types.DateTime">
+    <#elseif field.type?c == '19'><#return "sa.types.Binary">
+    <#elseif field.type?c == '20'><#return "sa.types.DateTime">
+    <#elseif field.type?c == '21'><#return "sa.types.String">
+    <#elseif field.type?c == '23'><#return "sa.types.String">
+    <#elseif field.type?c == '24'><#return "sa.types.BigInteger">
+    <#elseif field.type?c == '25'><#return "sa.types.BigInteger">
+    <#elseif field.type?c == '26'><#return "sa.types.DateTime">
+    <#elseif field.type?c == '27'><#return "sa.types.Unicode">
+    <#elseif field.type?c == '28'><#return "sa.types.Unicode">
+    <#elseif field.type?c == '29'><#return "sa.types.Unicode">
+    <#elseif field.type?c == '30'><#return "sa.types.String">
     <#else><#return "String">
     </#if>>
 </#function>
@@ -74,11 +76,13 @@
     </#if>
     <#if table.getLinkForField(field)??>
         <#assign link = table.getLinkForField(field)>
+        <#if link.getName() != table.name>
         <#local retVal = retVal + ", sa.ForeignKey(DB_" + link.getName() + "." + link.getFirstLinkField() + ")">
+        </#if>
     </#if>
     <#if field.isPrimaryKey()>
         <#if field.type?c == '10' || field.type?c == '14' || field.type?c == '24' || field.type?c == '25'>
-        <#-- All the sequence types.-->
+            <#-- All the sequence types.-->
             <#local retVal = retVal + ", primary_key=True">
         <#else>
             <#local retVal = retVal + ", primary_key=True, autoincrement=False">
@@ -169,14 +173,14 @@
         <#local externalTableName = link.getName()>
         <#local field = table.getFieldForLink(link) >
         <#return ", foreign_keys=[${field.name}]">
-    <#--        <#list table.getFields() as field>-->
-    <#--            <#if table.getLinkForField(field)??>-->
-    <#--                <#local linkL = table.getLinkForField(field) >-->
-    <#--                <#if linkL.getName() == externalTableName>-->
-    <#--                    <#return ", foreign_keys=[${field.name}]">-->
-    <#--                </#if>-->
-    <#--            </#if>-->
-    <#--        </#list>-->
+<#--        <#list table.getFields() as field>-->
+<#--            <#if table.getLinkForField(field)??>-->
+<#--                <#local linkL = table.getLinkForField(field) >-->
+<#--                <#if linkL.getName() == externalTableName>-->
+<#--                    <#return ", foreign_keys=[${field.name}]">-->
+<#--                </#if>-->
+<#--            </#if>-->
+<#--        </#list>-->
     </#if>
     <#return "">
 </#function>
@@ -201,8 +205,12 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import TextAsFrom
 
 from bbdcommon.database.db_common import DBMixin, Base, DBColumn
+from bbdcommon.database import db_types
+from bbdcommon.database.processing import process_result_recs, process_result_rec, process_bind_params
 <#list table.getLinks() as link>
-    from ${database.getPackageName()}.sqlalchemy.${link.getSchema()?lower_case}.db_${link.getName()} import DB_${link.getName()}
+<#if link.getName() != table.name>
+from .db_${link.getName()} import DB_${link.getName()}
+</#if>
 </#list>
 
 <#function getConstructorList table>
@@ -221,71 +229,78 @@ ${table.getName()?upper_case}_SCHEMA = "${table.getDatabase().getSchema()?lower_
 
 
 class DB_${table.name}(Base, DBMixin):
-<#list table.fields as field>
+    <#list table.fields as field>
 <#--        <#if field.name?lower_case != 'tmstamp'>-->
-    ${field.name}: <#compress>${getPythonType(false, field)}</#compress> = DBColumn("${field.name?lower_case}", <#compress>sa.${getSQLAlchemyColumnType(field)}${getColumnAttributes(field, table)})</#compress>
+    ${field.name}: <#compress>${getPythonType(false, field)}</#compress> = DBColumn("${field.name?lower_case}", <#compress>${getSQLAlchemyColumnType(field)}${getColumnAttributes(field, table)})</#compress>
 <#--        </#if>-->
-</#list>
+    </#list>
 <#--backref="F_${getFkName(link table)}"-->
-<#if table.links?size gt 0>
+    <#if table.links?size gt 0>
 
     # Foreign Key Links
-    <#list table.getLinks() as link>
-        F_${getFkName(link table)} = sa.orm.relationship(DB_${link.getName()}${getFkAdditionalParams(link, table)})
-    </#list>
-</#if>
+        <#list table.getLinks() as link>
+        <#if link.getName() != table.name>
+    F_${getFkName(link table)} = sa.orm.relationship(DB_${link.getName()}${getFkAdditionalParams(link, table)})
+        </#if>
+        </#list>
+    </#if>
 
-__schema__ = ${table.getName()?upper_case}_SCHEMA
+    __schema__ = ${table.getName()?upper_case}_SCHEMA
 
-def __init__(self${getConstructorList(table)}):
-super(DB_${table.name}, self).__init__(
-${getConstructorSetList(table)})
+    def __init__(self${getConstructorList(table)}):
+        super(DB_${table.name}, self).__init__(
+            ${getConstructorSetList(table)})
 <#list table.procs as proc>
-    <#if !proc.isStdExtended() && !proc.isSProc() && proc.name != "">
-        <#if proc.lines?size gt 0>
+<#if !proc.isBuiltIn() || database.flags?seq_contains("SQLAlchemy.generateBuiltIns")>
 
 
-            @dataclass
-            class DB_${table.name}${proc.name}:
-            <#list proc.outputs as field>
-            <#--  !table.hasField(field.name) &&   -->
-                ${field.name}: <#compress>${getPythonType(false, field)} = field(default=None)</#compress>
-            </#list>
+@dataclass
+class DB_${table.name}${proc.name}:
+    <#list proc.outputs as field>
+    <#--  !table.hasField(field.name) &&   -->
+    ${field.name}: <#compress>${getPythonType(false, field)} = field(default=None)</#compress>
+    </#list>
 
-            @classmethod
-            def get_statement(cls
-            <#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
-            </#list>) -> TextAsFrom:
-            statement = sa.text(<#list proc.lines as pl>
-            <#if pl.getUnformattedLine()?contains("_ret.") != true>"${pl.getUnformattedLine()?replace("\\", "\\\\")}"<#if pl.getUnformattedLine() == " ) "></#if></#if></#list>)
-            text_statement = statement.columns(<#list proc.outputs as field>${field.name}=sa.types.${getSQLAlchemyBaseType(field)},
-        </#list>)
+    @classmethod
+    def get_statement(cls
+                     <#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
+                     </#list>) -> TextAsFrom:
+        statement = sa.text(<#list proc.lines as pl>
+                        <#if pl.getUnformattedLine()?contains("_ret.") != true>"${pl.getUnformattedLine()?replace("\\", "\\\\")}"<#if pl.getUnformattedLine() == " ) "></#if></#if></#list>)
+        text_statement = statement.columns(<#list proc.outputs as field>${field.name}=${getSQLAlchemyBaseType(field)},
+                                           </#list>)
         <#--  statement = statement.columns(<#list proc.outputs as field>column('${field.name}'), \
                                     </#list>)  -->
-            <#if proc.inputs?size gt 0>
-                text_statement = text_statement.bindparams(<#list proc.inputs as field>${field.name}=${field.name},
-            </#list>)
-            </#if>
-            return text_statement
-
-            @classmethod
-            def execute(cls, session: Session<#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
-        </#list>) -> ${getTableReturnType(proc, "DB_" + table.name + proc.name)}:
-            res = session.execute(cls.get_statement(<#list proc.inputs as field>${field.name},
-        </#list>))
-            <#if proc.isSingle()>
-                rec = res.fetchone()
-                if rec:
-                res.close()
-                return DB_${table.name}${proc.name}(*rec)
-
-                return None
-            <#elseif proc.outputs?size gt 0>
-                recs = res.fetchall()
-                return [DB_${table.name}${proc.name}(*r) for r in recs]
-            <#else>
-                res.close()
-            </#if>
+        <#if proc.inputs?size gt 0>
+        text_statement = text_statement.bindparams(<#list proc.inputs as field>${field.name}=${field.name},
+                                         </#list>)
         </#if>
-    </#if>
+        return text_statement
+
+    @classmethod
+    def execute(cls, session: Session<#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
+                     </#list>) -> ${getTableReturnType(proc, "DB_" + table.name + proc.name)}:
+        <#if proc.inputs?size gt 0>
+        params = process_bind_params(session, [<#list proc.inputs as field>${getSQLAlchemyBaseType(field)},
+                                        </#list>], [<#list proc.inputs as field>${field.name},
+                                        </#list>])
+        </#if>
+        res = session.execute(cls.get_statement(<#if proc.inputs?size gt 0>*params</#if>))
+        <#if proc.isSingle()>
+        rec = res.fetchone()
+        if rec:
+            res.close()
+            return process_result_rec(DB_${table.name}${proc.name}, session, [<#list proc.outputs as field>${getSQLAlchemyBaseType(field)},
+                                        </#list>], rec)
+
+        return None
+        <#elseif proc.outputs?size gt 0>
+        recs = res.fetchall()
+        return process_result_recs(DB_${table.name}${proc.name}, session, [<#list proc.outputs as field>${getSQLAlchemyBaseType(field)},
+                                        </#list>], recs)
+        <#else>
+        res.close()
+        </#if>
+<#--    </#if>-->
+</#if>
 </#list>
