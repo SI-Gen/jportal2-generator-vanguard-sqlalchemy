@@ -72,17 +72,19 @@
 <#-- @ftlvariable name="table" type="bbd.jportal2.Table" -->
     <#local retVal = "">
     <#if field.type?c == '14' || field.type?c == '24'>
-        <#local retVal = retVal + ', sa.Sequence("' + table.getName()?upper_case + 'SEQ", metadata=Base.metadata, schema=${table.getName()?upper_case}_SCHEMA)'>
+<#--        <#local retVal = retVal + ', sa.Sequence("' + table.getName()?upper_case + 'SEQ", metadata=Base.metadata, schema=${table.getName()?upper_case}_SCHEMA)'>-->
+        <#local retVal = retVal + ', sa.Sequence("' + table.getName()?lower_case + "_" + field.name?lower_case + '_seq", metadata=Base.metadata, schema=${table.getName()?upper_case}_SCHEMA)'>
+
     </#if>
     <#if table.getLinkForField(field)??>
         <#assign link = table.getLinkForField(field)>
         <#if link.getName() != table.name>
-            <#local retVal = retVal + ", sa.ForeignKey(DB_" + link.getName() + "." + link.getFirstLinkField() + ")">
+        <#local retVal = retVal + ", sa.ForeignKey(DB_" + link.getName() + "." + link.getFirstLinkField() + ")">
         </#if>
     </#if>
     <#if field.isPrimaryKey()>
         <#if field.type?c == '10' || field.type?c == '14' || field.type?c == '24' || field.type?c == '25'>
-        <#-- All the sequence types.-->
+            <#-- All the sequence types.-->
             <#local retVal = retVal + ", primary_key=True">
         <#else>
             <#local retVal = retVal + ", primary_key=True, autoincrement=False">
@@ -173,14 +175,14 @@
         <#local externalTableName = link.getName()>
         <#local field = table.getFieldForLink(link) >
         <#return ", foreign_keys=[${field.name}]">
-    <#--        <#list table.getFields() as field>-->
-    <#--            <#if table.getLinkForField(field)??>-->
-    <#--                <#local linkL = table.getLinkForField(field) >-->
-    <#--                <#if linkL.getName() == externalTableName>-->
-    <#--                    <#return ", foreign_keys=[${field.name}]">-->
-    <#--                </#if>-->
-    <#--            </#if>-->
-    <#--        </#list>-->
+<#--        <#list table.getFields() as field>-->
+<#--            <#if table.getLinkForField(field)??>-->
+<#--                <#local linkL = table.getLinkForField(field) >-->
+<#--                <#if linkL.getName() == externalTableName>-->
+<#--                    <#return ", foreign_keys=[${field.name}]">-->
+<#--                </#if>-->
+<#--            </#if>-->
+<#--        </#list>-->
     </#if>
     <#return "">
 </#function>
@@ -208,9 +210,9 @@ from bbdcommon.database.db_common import DBMixin, Base, DBColumn
 from bbdcommon.database import db_types
 from bbdcommon.database.processing import process_result_recs, process_result_rec, process_bind_params
 <#list table.getLinks() as link>
-    <#if link.getName() != table.name>
-        from .db_${link.getName()} import DB_${link.getName()}
-    </#if>
+<#if link.getName() != table.name>
+from .db_${link.getName()} import DB_${link.getName()}
+</#if>
 </#list>
 
 <#function getConstructorList table>
@@ -229,89 +231,84 @@ ${table.getName()?upper_case}_SCHEMA = "${table.getDatabase().getSchema()?lower_
 
 
 class DB_${table.name}(Base, DBMixin):
-<#list table.fields as field>
+    <#list table.fields as field>
 <#--        <#if field.name?lower_case != 'tmstamp'>-->
     ${field.name}: <#compress>${getPythonType(false, field)}</#compress> = DBColumn("${field.name?lower_case}", <#compress>${getSQLAlchemyColumnType(field)}${getColumnAttributes(field, table)})</#compress>
 <#--        </#if>-->
-</#list>
+    </#list>
 <#--backref="F_${getFkName(link table)}"-->
-<#if table.links?size gt 0>
+    <#if table.links?size gt 0>
 
     # Foreign Key Links
-    <#list table.getLinks() as link>
+        <#list table.getLinks() as link>
         <#if link.getName() != table.name>
-            F_${getFkName(link table)} = sa.orm.relationship(DB_${link.getName()}${getFkAdditionalParams(link, table)})
+    F_${getFkName(link table)} = sa.orm.relationship(DB_${link.getName()}${getFkAdditionalParams(link, table)})
         </#if>
-    </#list>
-</#if>
-
-__schema__ = ${table.getName()?upper_case}_SCHEMA
-
-def __init__(self${getConstructorList(table)}):
-super(DB_${table.name}, self).__init__(
-${getConstructorSetList(table)})
-<#list table.procs as proc>
-    <#if !proc.isBuiltIn() || database.flags?seq_contains("SQLAlchemy.generateBuiltIns")>
-
-
-        @dataclass
-        class DB_${table.name}${proc.name}:
-        """
-        Usage:
-        res = db_${table.name}.DB_${table.name}${proc.name}.execute(cls, session<#list proc.inputs as field>, ${field.name}</#list>)
-        """
-        <#list proc.outputs as field>
-        <#--  !table.hasField(field.name) &&   -->
-            ${field.name}: <#compress>${getPythonType(false, field)} = field(default=None)</#compress>
         </#list>
+    </#if>
 
-        @classmethod
-        def get_statement(cls
-        <#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
-        </#list>) -> TextAsFrom:
+    __schema__ = ${table.getName()?upper_case}_SCHEMA
+
+    def __init__(self${getConstructorList(table)}):
+        super(DB_${table.name}, self).__init__(
+            ${getConstructorSetList(table)})
+<#list table.procs as proc>
+<#if !proc.isBuiltIn() || database.flags?seq_contains("SQLAlchemy.generateBuiltIns")>
+
+@dataclass
+class DB_${table.name}${proc.name}:
+    <#list proc.outputs as field>
+    <#--  !table.hasField(field.name) &&   -->
+    ${field.name}: <#compress>${getPythonType(false, field)} = field(default=None)</#compress>
+    </#list>
+
+    @classmethod
+    def get_statement(cls
+                     <#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
+                     </#list>) -> TextAsFrom:
+        class _ret:
+            sequence = "default," #postgres uses default for sequences
+            output = <#if proc.isInsert()==false && proc.outputs?size gt 0>" OUTPUT (<#list proc.outputs as x>${x.name}<#sep>,</#list>)"<#else>""</#if>
+            tail = <#if proc.outputs?size gt 0>" RETURNING <#list proc.outputs as x>${x.name}<#sep> </#list>"<#else>""</#if>
+            #session.bind.dialect.name
+
         statement = sa.text(<#list proc.lines as pl>
-        <#if pl.getUnformattedLine()?contains("_ret.") != true>"${pl.getUnformattedLine()?replace("\\", "\\\\")}"<#if pl.getUnformattedLine() == " ) "></#if></#if></#list>)
+<#--                        <#if pl.getUnformattedLine()?contains("_ret.") != true>"${pl.getUnformattedLine()}"<#if pl.getUnformattedLine() == " ) "></#if></#if></#list>)-->
+                        f"${pl.getUnformattedLine()?replace("^(_ret.*\\w)","{$1}","r")}"<#if pl.getUnformattedLine() == " ) "></#if></#list>)
+
         text_statement = statement.columns(<#list proc.outputs as field>${field.name}=${getSQLAlchemyBaseType(field)},
-    </#list>)
-    <#--  statement = statement.columns(<#list proc.outputs as field>column('${field.name}'), \
-                                </#list>)  -->
+                                      </#list>)
+        <#--  statement = statement.columns(<#list proc.outputs as field>column('${field.name}'), \
+                                    </#list>)  -->
         <#if proc.inputs?size gt 0>
-            text_statement = text_statement.bindparams(<#list proc.inputs as field>${field.name}=${field.name},
-        </#list>)
+        text_statement = text_statement.bindparams(<#list proc.inputs as field>${field.name}=${field.name},
+                                         </#list>)
         </#if>
         return text_statement
 
-        @classmethod
-        def execute(cls, session: Session<#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
-    </#list>) -> ${getTableReturnType(proc, "DB_" + table.name + proc.name)}:
-        """
-        :param session: The SQLAlchemy session to execute this query on.
-        <#list proc.inputs as field>
-            :param ${field.name}: ${getPythonType(false, field)}
-        </#list>
-        :return: ${getTableReturnType(proc, "DB_" + table.name + proc.name)}
-        """
+    @classmethod
+    def execute(cls, session: Session<#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
+                     </#list>) -> ${getTableReturnType(proc, "DB_" + table.name + proc.name)}:
         <#if proc.inputs?size gt 0>
-            params = process_bind_params(session, [<#list proc.inputs as field>${getSQLAlchemyBaseType(field)},
-        </#list>], [<#list proc.inputs as field>${field.name},
-        </#list>])
+        params = process_bind_params(session, [<#list proc.inputs as field>${getSQLAlchemyBaseType(field)},
+                                        </#list>], [<#list proc.inputs as field>${field.name},
+                                        </#list>])
         </#if>
         res = session.execute(cls.get_statement(<#if proc.inputs?size gt 0>*params</#if>))
         <#if proc.isSingle()>
-            rec = res.fetchone()
-            if rec:
+        rec = res.fetchone()
+        if rec:
             res.close()
             return process_result_rec(DB_${table.name}${proc.name}, session, [<#list proc.outputs as field>${getSQLAlchemyBaseType(field)},
-        </#list>], rec)
+                                        </#list>], rec)
 
-            return None
+        return None
         <#elseif proc.outputs?size gt 0>
-            recs = res.fetchall()
-            return process_result_recs(DB_${table.name}${proc.name}, session, [<#list proc.outputs as field>${getSQLAlchemyBaseType(field)},
-        </#list>], recs)
+        recs = res.fetchall()
+        return process_result_recs(DB_${table.name}${proc.name}, session, [<#list proc.outputs as field>${getSQLAlchemyBaseType(field)},
+                                        </#list>], recs)
         <#else>
-            res.close()
+        res.close()
         </#if>
-    <#--    </#if>-->
     </#if>
 </#list>

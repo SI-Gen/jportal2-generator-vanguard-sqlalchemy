@@ -34,6 +34,12 @@ Generates the built-in PROC's like Insert, SelectOne, Update, SelectBy etc.
 Usage in Python code:
 =====================
 
+This generated code leverages SQLAlchemy.
+You need to install the following requirements:
+```shell
+pip install sqlalchemy
+```
+
 Using the generated procs:
 ```python
 res = db_ExampleTable.DB_ExampleTableSelectOne.execute(session, primary_key)
