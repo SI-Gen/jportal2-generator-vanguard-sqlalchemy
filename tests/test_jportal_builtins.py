@@ -1,21 +1,94 @@
 from conftest import postgres_db
 
-def test_JportalInsert(generate_jportal, postgres_db, run_takeons):
+def test_JPortalInsertReturning(generate_jportal, postgres_db, run_takeons):
     from sqlalchemy.orm import Session
     from generated import DB_ToDoListInsert
     import datetime
 
     session = Session(postgres_db)
-    DB_ToDoListInsert.execute(session,"JPortalInsert List", 1,"Jportal Insert List Description",datetime.datetime.now())
-    session.flush()
+    rec = DB_ToDoListInsert.execute(session,"JPortalInsert List", 1,"Jportal Insert List Description",datetime.datetime.now())
+    session.commit()
 
-    res = postgres_db.execute("SELECT ListName,ListType,Description,LastUpdated "
-                              "FROM ToDoList_App.ToDoList ")
-                              #"WHERE ID="+str(lst.ID))
+    res = postgres_db.execute("SELECT ID, ListName,ListType,Description,LastUpdated "
+                              "FROM ToDoList_App.ToDoList "
+                              "WHERE ID="+str(rec.ID))
 
     x = res.fetchall()
 
-    #assert((res.fetchall())[0]==lst.ID)
+    assert(x[0] == rec.ID)
+
+def test_JPortalInsertWithoutReturning(generate_jportal, postgres_db, run_takeons):
+    from sqlalchemy.orm import Session
+    from generated import DB_ToDo_ItemInsert
+    import datetime
+
+    session = Session(postgres_db)
+
+    res = postgres_db.execute(
+        f"/* PROC ToDoList_App.ToDoList.Insert */"
+        f"insert into ToDoList_App.ToDoList ("
+        f"  ID,"
+        f"  ListName,"
+        f"  ListType,"
+        f"  Description,"
+        f"  LastUpdated"
+        f" ) "
+        f" values ("
+        f" default ,"
+        f"  'LIST',"
+        f"  1,"
+        f"  'Desc',"
+        f"  '2020-01-01'"
+        f" )"
+        f"returning ID")
+    id = res.fetchone()[0]
+
+    rec = DB_ToDo_ItemInsert.execute(session,TodoList_ID=id, ItemName="Item 1", ItemDescription="Description", LastUpdated=datetime.datetime.now())
+    session.commit()
+
+    res = postgres_db.execute("SELECT TodoList_ID, ItemName,ItemDescription "
+                              "FROM ToDoList_App.ToDo_Item "
+                              "WHERE TodoList_ID="+str(id))
+
+    x = res.fetchone()
+
+    assert(x[0] == id)
+    assert(x[1] == "Item 1")
+    assert(x[2] == "Description")
+
+
+def test_JPortalSelectOne(generate_jportal, postgres_db, run_takeons):
+    from sqlalchemy.orm import Session
+    from generated import DB_ToDoListSelectOne
+    import datetime
+
+    res = postgres_db.execute(
+        f"/* PROC ToDoList_App.ToDoList.Insert */"
+        f"insert into ToDoList_App.ToDoList ("
+        f"  ID,"
+        f"  ListName,"
+        f"  ListType,"
+        f"  Description,"
+        f"  LastUpdated"
+        f" ) "
+        f" values ("
+        f" default ,"
+        f"  'LIST',"
+        f"  1,"
+        f"  'Desc',"
+        f"  '2020-01-01'"
+        f" )"
+        f"returning ID")
+    id = res.fetchone()[0]
+    session = Session(postgres_db)
+    rec = DB_ToDoListSelectOne.execute(session, id)
+
+    assert(rec.ListName == "LIST")
+    assert(rec.ListType == 1)
+    assert(rec.Description == "Desc")
+    assert(rec.LastUpdated == datetime.date(2020, 1, 1))
+
+
 
 def test_AlchemySelectByPK(generate_jportal, postgres_db, run_takeons):
     from sqlalchemy.orm import Session

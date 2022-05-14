@@ -4,7 +4,7 @@ SERVER ExampleServer
 SCHEMA ToDoList_App
 
 TABLE ToDo_Item
-   ID               SEQUENCE
+   ID               BIGSEQUENCE
    TodoList_ID      INT     //This is a foreign key to the ToDoList table
    ItemName         CHAR(255)
    ItemDescription  CLOB
@@ -14,7 +14,9 @@ TABLE ToDo_Item
 KEY PKEY PRIMARY
     ID
 
-PROC Insert Returning
+//We do a normal Insert without a Returning here, to test the regular generaion
+//We do an InsertReturning in the ToDoList table to test that generation there
+PROC Insert
 PROC Update
 PROC SelectOne
 PROC DeleteOne
