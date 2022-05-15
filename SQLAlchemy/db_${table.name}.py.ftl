@@ -258,14 +258,13 @@ class DB_${table.name}(Base, DBMixin):
 @dataclass
 class DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if>:
     <#list proc.outputs as field>
-    <#--  !table.hasField(field.name) &&   -->
     ${field.name}: <#compress>${getPythonType(false, field)} = field(default=None)</#compress>
     </#list>
 
     @classmethod
     def get_statement(cls
                      <#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
-                     </#list>) -> TextAsFrom:
+                     </#list><#list proc.dynamics as dynamic>, ${dynamic}: str</#list>) -> TextAsFrom:
         class _ret:
             sequence = "default," #postgres uses default for sequences
             output = <#if proc.isInsert()==false && proc.outputs?size gt 0>" OUTPUT (<#list proc.outputs as x>${x.name}<#sep>,</#list>)"<#else>""</#if>
@@ -274,7 +273,7 @@ class DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if>:
 
         statement = sa.text(<#list proc.lines as pl>
 <#--                        <#if pl.getUnformattedLine()?contains("_ret.") != true>"${pl.getUnformattedLine()}"<#if pl.getUnformattedLine() == " ) "></#if></#if></#list>)-->
-                        f"${pl.getUnformattedLine()?replace("^(_ret.*\\w)","{$1}","r")}"<#if pl.getUnformattedLine() == " ) "></#if></#list>)
+                        <#if pl.isVar()>f"{${pl.getUnformattedLine()}}"<#else>f"${pl.getUnformattedLine()?replace("^(_ret.*\\w)","{$1}","r")}"<#if pl.getUnformattedLine() == " ) "></#if></#if></#list>)
 
         text_statement = statement.columns(<#list proc.outputs as field>${field.name}=${getSQLAlchemyBaseType(field)},
                                       </#list>)
@@ -288,11 +287,11 @@ class DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if>:
 
     @classmethod
     def execute(cls, session: Session<#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
-                     </#list>) -> ${getTableReturnType(proc, "DB_" + table.name + proc.name + proc.hasReturning?then("Returning",""))}:
+                     </#list><#list proc.dynamics as dynamic>, ${dynamic}: str</#list>) -> ${getTableReturnType(proc, "DB_" + table.name + proc.name + proc.hasReturning?then("Returning",""))}:
         <#if proc.inputs?size gt 0>
         params = process_bind_params(session, [<#list proc.inputs as field>${getSQLAlchemyBaseType(field)},
-                                        </#list>], [<#list proc.inputs as field>${field.name},
-                                        </#list>])
+                                        </#list><#list proc.dynamics as dynamic>db_types.NonNullableString,</#list>], [<#list proc.inputs as field>${field.name},
+                                        </#list><#list proc.dynamics as dynamic>${dynamic},</#list>])
         </#if>
         res = session.execute(cls.get_statement(<#if proc.inputs?size gt 0>*params</#if>))
         <#if proc.isSingle()>

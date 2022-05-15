@@ -43,7 +43,7 @@ ENDCODE
 //Dynamic queries can be done with the ampersand below
 //REMEMBER!!! Dynamic SQL is open to SQL injection! So use with care and make sure to sanitize inputs!
 //Dynamic SQL is a last resort escape hatch, not the first tool to reach for!!
-//In the DAL class created for the below query, a property called MyDynamicWhereClause will be created
+//In the DAL class created for the below query, a property called MyDynamicWhereClause with length 255 will be created
 //This will allow you to pass through the remainder of the where clause as a string.
 PROC SelectWithDynamicQuery
 INPUT
@@ -62,10 +62,10 @@ SQLCODE
          ,Description
          ,LastUpdated
     FROM
-        ToDoList
+        ToDoList_App.ToDoList
     WHERE
             ListName = :ListName
-      AND &MyDynamicWhereClause
+      AND &MyDynamicWhereClause(255)
 ENDCODE
 
 ////You can put take-on or test data in this section

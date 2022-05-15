@@ -147,3 +147,20 @@ def test_JPortalUpdate(generate_jportal, postgres14p2_db, run_takeons, todolist_
     assert(rec.ItemName == todoitem_single_test_record.ItemName)
     assert(rec.ItemDescription == todoitem_single_test_record.ItemDescription)
     assert(rec.LastUpdated == datetime.datetime(2021, 1, 1, 0, 0))
+
+def test_JPortalDynamicSQL(generate_jportal, postgres14p2_db, run_takeons, todolist_single_test_record):
+    from sqlalchemy.orm import Session
+    from generated import DB_ToDoListSelectWithDynamicQuery
+    import datetime
+
+    session = Session(postgres14p2_db)
+
+    session.add(todolist_single_test_record)
+    session.commit()
+
+    recs = DB_ToDoListSelectWithDynamicQuery.execute(session, todolist_single_test_record.ListName, f"ID = {todolist_single_test_record.ID}")
+    rec = recs[0]
+    assert(rec.ListName == "LIST")
+    assert(rec.ListType == 1)
+    assert(rec.Description == "Desc")
+    assert(rec.LastUpdated == datetime.datetime(2020, 1, 1, 0, 0))

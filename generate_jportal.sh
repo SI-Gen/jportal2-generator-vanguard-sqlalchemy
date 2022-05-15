@@ -8,4 +8,6 @@ docker run --rm -v ${PWD}:/local bbdsoftware/jportal2 \
                       --builtin-generator \
                         PythonCliCode:/local/generated_sources/pymod \
                       --builtin-generator \
+                        CSNetCode:/local/generated_sources/csnet \
+                      --builtin-generator \
                       PostgresDDL:/local/generated_sources/generated_sql
