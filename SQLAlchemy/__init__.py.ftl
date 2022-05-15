@@ -36,7 +36,7 @@ __all__ = [
 <#list database.getTables()?sort as table>
     <#list table.getProcs()?sort as proc>
         <#if !proc.isBuiltIn() || database.flags?seq_contains("SQLAlchemy.generateBuiltIns")>
-    "DB_${table.getName()}${proc.name}<#if proc.hasReturning>Returning</#if>,",
+    "DB_${table.getName()}${proc.name}<#if proc.hasReturning>Returning</#if>",
         </#if>
     </#list>
 <#sep>${"\n"}</#list>
