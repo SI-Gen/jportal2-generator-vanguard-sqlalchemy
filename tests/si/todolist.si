@@ -20,7 +20,13 @@ PROC SelectOne
 PROC DeleteOne
 PROC Exists
 
-//More complex custom queries can be defined using standard SQL
+PROC SelectOneBy ListName
+PROC SelectBy ListType
+
+PROC SelectBy ListType AS SelectIDByListType
+OUTPUT ID =
+
+    //More complex custom queries can be defined using standard SQL
 PROC SelectListNameAndListTypeAsString
 INPUT
     ID          =
