@@ -21,7 +21,7 @@
     <#elseif field.type?c == '15'><#return "sa.SmallInteger()">
     <#elseif field.type?c == '17'><#return "sa.DateTime()">
     <#elseif field.type?c == '18'><#return "sa.DateTime()">
-    <#elseif field.type?c == '19'><#return "sa.Binary()">
+    <#elseif field.type?c == '19'><#return "sa.Text()">
     <#elseif field.type?c == '20'><#return "sa.DateTime()">
     <#elseif field.type?c == '21'><#return "sa.String(length=#{field.length; M0})">
     <#elseif field.type?c == '23'><#return "sa.String(length=#{field.length; M0})">
@@ -129,7 +129,7 @@
     <#elseif field.type?c == '15'><#return prefix + "int" + suffix>
     <#elseif field.type?c == '17'><#return prefix + "datetime" + suffix>
     <#elseif field.type?c == '18'><#return prefix + "datetime" + suffix>
-    <#elseif field.type?c == '19'><#return prefix + "Any" + suffix>
+    <#elseif field.type == STATICS.Field.BLOB><#return prefix + "str" + suffix>
     <#elseif field.type?c == '20'><#return prefix + "datetime" + suffix>
     <#elseif field.type?c == '21'><#return prefix + "str" + suffix>
     <#elseif field.type?c == '23'><#return prefix + "str" + suffix>
@@ -256,7 +256,7 @@ class DB_${table.name}(Base, DBMixin):
 <#if !proc.isBuiltIn() || database.flags?seq_contains("SQLAlchemy.generateBuiltIns")>
 
 @dataclass
-class DB_${table.name}${proc.name}:
+class DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if>:
     <#list proc.outputs as field>
     <#--  !table.hasField(field.name) &&   -->
     ${field.name}: <#compress>${getPythonType(false, field)} = field(default=None)</#compress>
@@ -288,7 +288,7 @@ class DB_${table.name}${proc.name}:
 
     @classmethod
     def execute(cls, session: Session<#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
-                     </#list>) -> ${getTableReturnType(proc, "DB_" + table.name + proc.name)}:
+                     </#list>) -> ${getTableReturnType(proc, "DB_" + table.name + proc.name + proc.hasReturning?then("Returning",""))}:
         <#if proc.inputs?size gt 0>
         params = process_bind_params(session, [<#list proc.inputs as field>${getSQLAlchemyBaseType(field)},
                                         </#list>], [<#list proc.inputs as field>${field.name},
@@ -299,13 +299,13 @@ class DB_${table.name}${proc.name}:
         rec = res.fetchone()
         if rec:
             res.close()
-            return process_result_rec(DB_${table.name}${proc.name}, session, [<#list proc.outputs as field>${getSQLAlchemyBaseType(field)},
+            return process_result_rec(DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if>, session, [<#list proc.outputs as field>${getSQLAlchemyBaseType(field)},
                                         </#list>], rec)
 
         return None
         <#elseif proc.outputs?size gt 0>
         recs = res.fetchall()
-        return process_result_recs(DB_${table.name}${proc.name}, session, [<#list proc.outputs as field>${getSQLAlchemyBaseType(field)},
+        return process_result_recs(DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if>, session, [<#list proc.outputs as field>${getSQLAlchemyBaseType(field)},
                                         </#list>], recs)
         <#else>
         res.close()
