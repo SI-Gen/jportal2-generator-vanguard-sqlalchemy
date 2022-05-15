@@ -26,10 +26,10 @@ def test_JPortalInsertReturning(generate_jportal, postgres14p2_db, run_takeons):
 
     session = Session(postgres14p2_db)
     rec = DB_ToDoListInsertReturning.execute(session,
-                                    "JPortalInsert List",
-                                    1,
-                                    "Jportal Insert List Description",
-                                    datetime.datetime.now())
+                                             "JPortalInsert List",
+                                             1,
+                                             "Jportal Insert List Description",
+                                             datetime.datetime.now())
     session.commit()
 
     res = postgres14p2_db.execute("SELECT ID, ListName,ListType,Description,LastUpdated "
