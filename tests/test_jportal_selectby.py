@@ -73,7 +73,7 @@ def test_JPortalSelectByReturningCustomFields(generate_jportal, postgres14p2_db,
     assert (rec[0].ID == rec1.ID)
     assert (rec[1].ID == rec2.ID)
 
-    #Finally check that only the ID field is generated
+    # Finally, check that only the ID field is generated
     assert(not hasattr(DB_ToDoListSelectIDByListType, 'ListType'))
     assert(not hasattr(DB_ToDoListSelectIDByListType, 'Description'))
     assert(not hasattr(DB_ToDoListSelectIDByListType, 'LastUpdated'))

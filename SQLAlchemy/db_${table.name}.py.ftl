@@ -3,7 +3,8 @@
 ################## Generated Code. DO NOT CHANGE THIS CODE. Change it in the generator and regenerate ##################
 ########################################################################################################################
 
-<#function getSQLAlchemyColumnType field>
+<#function getSQLAlchemyColumnType field table>
+<#--    <#if field.enums?size gt 0><#return "sa.Enum(${table.name}${field.name}Enum)"></#if>-->
     <#if field.type?c == '1'><#return "sa.Binary()">
     <#elseif field.type?c == '2'><#return "db_types.Boolean()">
     <#elseif field.type?c == '3'><#return "sa.SmallInteger()">
@@ -201,7 +202,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List, Any, Optional
-
+<#list table.fields as field><#if field.enums?size gt 0>import enum<#break></#if></#list>
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import TextAsFrom
@@ -231,9 +232,18 @@ ${table.getName()?upper_case}_SCHEMA = "${table.getDatabase().getSchema()?lower_
 
 
 class DB_${table.name}(Base, DBMixin):
+    <#list table.fields as field><#if field.enums?size gt 0>
+    # Enum for ${field.name} field
+    class ${table.name}${field.name}Enum(enum.Enum):
+        <#list field.enums as enum>
+        ${enum.name} = ${enum.value}
+        </#list>
+
+    </#if>
+    </#list>
     <#list table.fields as field>
 <#--        <#if field.name?lower_case != 'tmstamp'>-->
-    ${field.name}: <#compress>${getPythonType(false, field)}</#compress> = DBColumn("${field.name?lower_case}", <#compress>${getSQLAlchemyColumnType(field)}${getColumnAttributes(field, table)})</#compress>
+    ${field.name}: <#compress>${getPythonType(false, field)}</#compress> = DBColumn("${field.name?lower_case}", <#compress>${getSQLAlchemyColumnType(field, table)}${getColumnAttributes(field, table)})</#compress>
 <#--        </#if>-->
     </#list>
 <#--backref="F_${getFkName(link table)}"-->
@@ -257,8 +267,26 @@ class DB_${table.name}(Base, DBMixin):
 
 @dataclass
 class DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if><#if proc.isData()>StaticData</#if>:
+    <#list proc.inputs as field><#if field.enums?size gt 0>
+    # Enum for ${field.name} field
+    class ${table.name}${proc.name}${field.name}Enum(enum.Enum):
+        <#list field.enums as enum>
+        ${enum.name} = ${enum.value}
+        </#list>
+
+    </#if>
+    </#list>
+    <#list proc.outputs as field><#if field.enums?size gt 0>
+    # Enum for ${field.name} field
+    class ${table.name}${proc.name}${field.name}Enum(enum.Enum):
+    <#list field.enums as enum>
+        ${enum.name} = ${enum.value}
+    </#list>
+
+    </#if>
+    </#list>
     <#list proc.outputs as field>
-    ${field.name}: <#compress>${getPythonType(false, field)} = field(default=None)</#compress>
+    ${field.name}: <#compress>${getPythonType(false, field)}</#compress>
     </#list>
 
     @classmethod
@@ -272,7 +300,6 @@ class DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if><#if pro
             #session.bind.dialect.name
 
         statement = sa.text(<#list proc.lines as pl>
-<#--                        <#if pl.getUnformattedLine()?contains("_ret.") != true>"${pl.getUnformattedLine()}"<#if pl.getUnformattedLine() == " ) "></#if></#if></#list>)-->
                         <#if pl.isVar()>f"{${pl.getUnformattedLine()}}"<#else>f"${pl.getUnformattedLine()?replace("^(_ret.*\\w)","{$1}","r")}"<#if pl.getUnformattedLine() == " ) "></#if></#if></#list>)
 
         text_statement = statement.columns(<#list proc.outputs as field>${field.name}=${getSQLAlchemyBaseType(field)},
