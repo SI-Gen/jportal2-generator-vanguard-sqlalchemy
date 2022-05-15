@@ -28,13 +28,11 @@ def generate_jportal():
     client.containers.run("bbdsoftware/jportal2",
                           "--inputdir=/local/tests/si \
                           --template-location=/local \
-                        --flag SQLAlchemy.generateBuiltIns \
-                        --template-generator \
-                          SQLAlchemy:/local/generated_sources/generated \
-                        --builtin-generator \
-                          PythonCliCode:/local/generated_sources/pymod \
-                        --builtin-generator \
-                        PostgresDDL:/local/generated_sources/generated_sql",
+                          --flag SQLAlchemy.generateBuiltIns \
+                          --template-generator \
+                            SQLAlchemy:/local/generated_sources/generated \
+                          --builtin-generator \
+                            PostgresDDL:/local/generated_sources/generated_sql",
                           auto_remove=True,
                           volumes=[f'{parent}:/local']
                           )

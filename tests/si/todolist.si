@@ -68,7 +68,7 @@ SQLCODE
       AND &MyDynamicWhereClause(255)
 ENDCODE
 
-////You can put take-on or test data in this section
-// SQLDATA
-// INSERT INTO ToDoList_App.ToDoList(ListName,ListType,Description,LastUpdated) VALUES ('Takeon Test List 1', 1, 'Take on test list description', CURRENT_DATE )
-// ENDDATA
+//You can put take-on or test data in this section
+SQLDATA
+    INSERT INTO ToDoList_App.ToDoList(ListName,ListType,Description,LastUpdated) VALUES ('Takeon Test List 1', 1, 'Take on test list description', CURRENT_DATE )
+ENDDATA

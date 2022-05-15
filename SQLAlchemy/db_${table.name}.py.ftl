@@ -253,10 +253,10 @@ class DB_${table.name}(Base, DBMixin):
         super(DB_${table.name}, self).__init__(
             ${getConstructorSetList(table)})
 <#list table.procs as proc>
-<#if !proc.isBuiltIn() || database.flags?seq_contains("SQLAlchemy.generateBuiltIns")>
+<#if (!proc.isBuiltIn() || database.flags?seq_contains("SQLAlchemy.generateBuiltIns"))>
 
 @dataclass
-class DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if>:
+class DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if><#if proc.isData()>StaticData</#if>:
     <#list proc.outputs as field>
     ${field.name}: <#compress>${getPythonType(false, field)} = field(default=None)</#compress>
     </#list>
