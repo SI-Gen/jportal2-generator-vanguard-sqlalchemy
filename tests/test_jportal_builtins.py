@@ -6,7 +6,8 @@ def todolist_single_test_record():
     import datetime
     from generated import DB_ToDoList
 
-    return DB_ToDoList(ListName="LIST", ListType=DB_ToDoList.ToDoListListTypeEnum.Private, Description="Desc", LastUpdated=datetime.date(2020, 1, 1))
+    # return DB_ToDoList(ListName="LIST", ListType=DB_ToDoList.ToDoListListTypeEnum.Private, Description="Desc", LastUpdated=datetime.date(2020, 1, 1))
+    return DB_ToDoList(ListName="LIST", ListType=1, Description="Desc", LastUpdated=datetime.date(2020, 1, 1))
 
 
 @pytest.fixture
