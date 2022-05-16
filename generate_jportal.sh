@@ -1,5 +1,5 @@
 echo Running JPortal2 from ${PWD}
-docker run --rm -v ${PWD}:/local bbdsoftware/jportal2 \
+docker run --rm -v ${PWD}:/local ghcr.io/si-gen/jportal2:latest \
                       --inputdir=/local/tests/si \
                       --template-location=/local \
                       --flag SQLAlchemy.generateBuiltIns \
