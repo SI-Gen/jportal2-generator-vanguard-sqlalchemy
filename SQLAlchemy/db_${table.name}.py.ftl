@@ -103,7 +103,7 @@
     </#if>
     <#return retVal>
 </#function>
-<#function getPythonType apply_to_pk field>
+<#function getPythonType apply_to_pk field >
 <#-- @ftlvariable name="field" type="bbd.jportal2.Field" -->
 
     <#assign prefix = ''>
@@ -243,7 +243,7 @@ class DB_${table.name}(Base, DBMixin):
     </#list>
     <#list table.fields as field>
 <#--        <#if field.name?lower_case != 'tmstamp'>-->
-    ${field.name}: <#compress>${getPythonType(false, field)}</#compress> = DBColumn("${field.name?lower_case}", <#compress>${getSQLAlchemyColumnType(field, table)}${getColumnAttributes(field, table)})</#compress>
+    ${field.name}: <#compress><#if field.enums?size gt 0>${table.name}${field.name}Enum<#else>${getPythonType(false, field)}</#if></#compress> = DBColumn("${field.name?lower_case}", <#compress>${getSQLAlchemyColumnType(field, table)}${getColumnAttributes(field, table)})</#compress>
 <#--        </#if>-->
     </#list>
 <#--backref="F_${getFkName(link table)}"-->
@@ -286,7 +286,7 @@ class DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if><#if pro
     </#if>
     </#list>
     <#list proc.outputs as field>
-    ${field.name}: <#compress>${getPythonType(false, field)}</#compress>
+    ${field.name}: <#compress><#if field.enums?size gt 0>${table.name}${proc.name}${field.name}Enum<#else>${getPythonType(false, field)}</#if></#compress>
     </#list>
 
     @classmethod
@@ -313,7 +313,7 @@ class DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if><#if pro
         return text_statement
 
     @classmethod
-    def execute(cls, session: Session<#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
+    def execute(cls, session: Session<#list proc.inputs as field>, ${field.name}: <#if field.enums?size gt 0>${table.name}${proc.name}${field.name}Enum<#else>${getPythonType(false, field)}</#if>
                      </#list><#list proc.dynamics as dynamic>, ${dynamic}: str</#list>) -> ${getTableReturnType(proc, "DB_" + table.name + proc.name + proc.hasReturning?then("Returning",""))}:
         <#if proc.inputs?size gt 0>
         params = process_bind_params(session, [<#list proc.inputs as field>${getSQLAlchemyBaseType(field)},
