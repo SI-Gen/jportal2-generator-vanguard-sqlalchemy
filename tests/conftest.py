@@ -25,7 +25,7 @@ def generate_jportal():
     cwd = os.getcwd()
     parent = os.path.dirname(cwd)
     print(parent)
-    client.containers.run("bbdsoftware/jportal2",
+    client.containers.run("ghcr.io/si-gen/jportal2:latest",
                           "--inputdir=/local/tests/si \
                           --template-location=/local \
                           --flag SQLAlchemy.generateBuiltIns \
