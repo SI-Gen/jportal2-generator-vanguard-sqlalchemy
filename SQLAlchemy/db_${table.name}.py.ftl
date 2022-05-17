@@ -211,23 +211,23 @@
     <#list field.enums as enum>
         ${enum.name} = ${enum.value}
     </#list>
-
-        @classmethod
-        def process_result_value_cls(cls, value, dialect):
-            return ${parent}.${field.name}Enum(value)
+<#---->
+<#--        @classmethod-->
+<#--        def process_result_value_cls(cls, value, dialect):-->
+<#--            return ${parent}.${field.name}Enum(value)-->
 
         @classmethod
         def process_bind_param_cls(cls, value, dialect):
             return value.value
+<#---->
+<#--        def process_bind_param(self, value, dialect):-->
+<#--            return ${field.name}Enum.process_bind_param_cls(value, dialect)-->
 
-        def process_bind_param(self, value, dialect):
-            return ${field.name}Enum.process_bind_param_cls(value, dialect)
+<#--        def process_result_value(self, value, dialect):-->
+<#--            return ${field.name}Enum.process_result_value_cls(value, dialect)-->
 
-        def process_result_value(self, value, dialect):
-            return ${field.name}Enum.process_result_value_cls(value, dialect)
-
-        def copy(self, **kw):
-            return ${field.name}Enum(**kw)
+<#--        def copy(self, **kw):-->
+<#--            return ${field.name}Enum(**kw)-->
 
 
 </#macro>
