@@ -211,14 +211,14 @@
     <#list field.enums as enum>
         ${enum.name} = ${enum.value}
     </#list>
-<#---->
-<#--        @classmethod-->
-<#--        def process_result_value_cls(cls, value, dialect):-->
-<#--            return ${parent}.${field.name}Enum(value)-->
 
         @classmethod
-        def process_bind_param_cls(cls, value, dialect):
-            return value.value
+        def process_result_value_cls(cls, value, dialect):
+            return ${parent}.${field.name}Enum(value)
+<#---->
+<#--        @classmethod-->
+<#--        def process_bind_param_cls(cls, value, dialect):-->
+<#--            return value.value-->
 <#---->
 <#--        def process_bind_param(self, value, dialect):-->
 <#--            return ${field.name}Enum.process_bind_param_cls(value, dialect)-->
@@ -331,7 +331,7 @@ class ${GenerateProcName(table, proc)}:
 
     @classmethod
     def execute(cls, session: Session<#list proc.inputs as field>, ${field.name}: <#if field.enums?size gt 0>${field.name}Enum<#else>${getPythonType(false, field)}</#if>
-                     </#list><#list proc.dynamics as dynamic>, ${dynamic}: str</#list>) -> ${getTableReturnType(proc, "DB_" + table.name + proc.name + proc.hasReturning?then("Returning",""))}:
+                     </#list><#list proc.dynamics as dynamic>, ${dynamic}: str</#list>) -> ${getTableReturnType(proc, GenerateProcName(table, proc))}:
         <#if proc.inputs?size gt 0>
         params = process_bind_params(session, [<#list proc.inputs as field>${getSQLAlchemyBaseType(field,GenerateProcName(table, proc))},
                                         </#list><#list proc.dynamics as dynamic>db_types.NonNullableString,</#list>], [<#list proc.inputs as field>${field.name}<#if field.enums?size gt 0>.value if isinstance(${field.name}, enum.Enum) else ${field.name}</#if>,
@@ -342,13 +342,13 @@ class ${GenerateProcName(table, proc)}:
         rec = res.fetchone()
         if rec:
             res.close()
-            return process_result_rec(DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if>, session, [<#list proc.outputs as field><#if field.enums?size gt 0>${GenerateProcName(table, proc)}.${field.name}Enum<#else>${getSQLAlchemyBaseType(field, proc)}</#if>,
+            return process_result_rec(${GenerateProcName(table, proc)}, session, [<#list proc.outputs as field><#if field.enums?size gt 0>${GenerateProcName(table, proc)}.${field.name}Enum<#else>${getSQLAlchemyBaseType(field, proc)}</#if>,
                                         </#list>], rec)
 
         return None
         <#elseif proc.outputs?size gt 0>
         recs = res.fetchall()
-        return process_result_recs(DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if>, session, [<#list proc.outputs as field><#if field.enums?size gt 0>${GenerateProcName(table, proc)}.${field.name}Enum<#else>${getSQLAlchemyBaseType(field, proc)}</#if>,
+        return process_result_recs(${GenerateProcName(table, proc)}, session, [<#list proc.outputs as field><#if field.enums?size gt 0>${GenerateProcName(table, proc)}.${field.name}Enum<#else>${getSQLAlchemyBaseType(field, proc)}</#if>,
                                         </#list>], recs)
         <#else>
         res.close()
