@@ -22,7 +22,7 @@
     <#elseif field.type?c == '15'><#return "sa.SmallInteger()">
     <#elseif field.type?c == '17'><#return "sa.DateTime()">
     <#elseif field.type?c == '18'><#return "sa.DateTime()">
-    <#elseif field.type?c == '19'><#return "sa.Text()">
+    <#elseif field.type == STATICS.Field.TLOB><#return "sa.Text()">
     <#elseif field.type?c == '20'><#return "sa.DateTime()">
     <#elseif field.type?c == '21'><#return "sa.String(length=#{field.length; M0})">
     <#elseif field.type?c == '23'><#return "sa.String(length=#{field.length; M0})">
@@ -33,6 +33,8 @@
     <#elseif field.type?c == '28'><#return "sa.Unicode(#{field.length; M0})">
     <#elseif field.type?c == '29'><#return "sa.Unicode(#{field.length; M0})">
     <#elseif field.type?c == '30'><#return "sa.String(length=#{field.length; M0})">
+    <#elseif field.type == STATICS.Field.JSON><#return "sa.JSON">
+    <#elseif field.type == STATICS.Field.BIGJSON><#return "sa.JSON">
     <#else><#return "String(100)">
     </#if>>
 </#function>
@@ -66,6 +68,8 @@
     <#elseif field.type?c == '28'><#return "sa.types.Unicode">
     <#elseif field.type?c == '29'><#return "sa.types.Unicode">
     <#elseif field.type?c == '30'><#return "sa.types.String">
+    <#elseif field.type == STATICS.Field.JSON><#return "sa.JSON">
+    <#elseif field.type == STATICS.Field.BIGJSON><#return "sa.JSON">
     <#else><#return "String">
     </#if>>
 </#function>
@@ -131,7 +135,7 @@
     <#elseif field.type?c == '15'><#return prefix + "int" + suffix>
     <#elseif field.type?c == '17'><#return prefix + "datetime" + suffix>
     <#elseif field.type?c == '18'><#return prefix + "datetime" + suffix>
-    <#elseif field.type == STATICS.Field.BLOB><#return prefix + "str" + suffix>
+    <#elseif field.type == STATICS.Field.TLOB><#return prefix + "str" + suffix>
     <#elseif field.type?c == '20'><#return prefix + "datetime" + suffix>
     <#elseif field.type?c == '21'><#return prefix + "str" + suffix>
     <#elseif field.type?c == '23'><#return prefix + "str" + suffix>
@@ -142,6 +146,9 @@
     <#elseif field.type?c == '28'><#return prefix + "str" + suffix>
     <#elseif field.type?c == '29'><#return prefix + "str" + suffix>
     <#elseif field.type?c == '30'><#return prefix + "str" + suffix>
+    <#elseif field.type == STATICS.Field.JSON><#return prefix + "str" + suffix>
+    <#elseif field.type == STATICS.Field.BIGJSON><#return prefix + "str" + suffix>
+
     <#else><#return prefix + "str" + suffix>
     </#if>>
 </#function>

@@ -5,7 +5,7 @@ SCHEMA ToDoList_App
 
 TABLE TestJSON
    ID               IDENTITY
-   Payload          INT
+   Payload          JSON
 
 KEY PKEY PRIMARY
     ID
