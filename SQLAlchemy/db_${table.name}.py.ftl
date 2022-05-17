@@ -269,7 +269,7 @@ class DB_${table.name}(Base, DBMixin):
     </#list>
     <#list table.fields as field>
 <#--        <#if field.name?lower_case != 'tmstamp'>-->
-    ${field.name}: <#compress><#if field.enums?size gt 0>${field.name}Enum<#else>${getPythonType(false, field)}</#if></#compress> = DBColumn("${field.name?lower_case}", <#compress>${getSQLAlchemyColumnType(field, table)}${getColumnAttributes(field, table)})</#compress>
+    ${field.name}: <#compress>${getPythonType(false, field)}</#compress> = DBColumn("${field.name?lower_case}", <#compress>${getSQLAlchemyColumnType(field, table)}${getColumnAttributes(field, table)})</#compress>
 <#--        </#if>-->
     </#list>
 <#--backref="F_${getFkName(link table)}"-->
@@ -303,12 +303,12 @@ class ${GenerateProcName(table, proc)}:
     </#list>
     <#if proc.outputs?size gt 0>#Outputs</#if>
     <#list proc.outputs as field>
-    ${field.name}: <#compress><#if field.enums?size gt 0>${field.name}Enum<#else>${getPythonType(false, field)}</#if></#compress>
+    ${field.name}: <#compress>${getPythonType(false, field)}</#compress>
     </#list>
 
     @classmethod
     def get_statement(cls
-                     <#list proc.inputs as field>, ${field.name}: <#if field.enums?size gt 0>${field.name}Enum<#else>${getPythonType(false, field)}</#if>
+                     <#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
                      </#list><#list proc.dynamics as dynamic>, ${dynamic}: str</#list>) -> TextAsFrom:
         class _ret:
             sequence = "default," #postgres uses default for sequences
@@ -330,7 +330,7 @@ class ${GenerateProcName(table, proc)}:
         return text_statement
 
     @classmethod
-    def execute(cls, session: Session<#list proc.inputs as field>, ${field.name}: <#if field.enums?size gt 0>${field.name}Enum<#else>${getPythonType(false, field)}</#if>
+    def execute(cls, session: Session<#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
                      </#list><#list proc.dynamics as dynamic>, ${dynamic}: str</#list>) -> ${getTableReturnType(proc, GenerateProcName(table, proc))}:
         <#if proc.inputs?size gt 0>
         params = process_bind_params(session, [<#list proc.inputs as field>${getSQLAlchemyBaseType(field,GenerateProcName(table, proc))},
