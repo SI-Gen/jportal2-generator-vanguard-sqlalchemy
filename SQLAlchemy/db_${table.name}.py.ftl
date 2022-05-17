@@ -4,7 +4,7 @@
 ########################################################################################################################
 
 <#function getSQLAlchemyColumnType field table>
-<#--    <#if field.enums?size gt 0><#return "sa.Enum(${table.name}${field.name}Enum)"></#if>-->
+<#--    <#if field.enums?size gt 0><#return "EnumAsSmallInteger()"></#if>-->
     <#if field.type?c == '1'><#return "sa.Binary()">
     <#elseif field.type?c == '2'><#return "db_types.Boolean()">
     <#elseif field.type?c == '3'><#return "sa.SmallInteger()">
@@ -36,7 +36,8 @@
     <#else><#return "String(100)">
     </#if>>
 </#function>
-<#function getSQLAlchemyBaseType field>
+<#function getSQLAlchemyBaseType field procname>
+<#--    <#if field.enums?size gt 0><#return "EnumAsSmallInteger()"></#if>&ndash;&gt;-->
     <#if field.type?c == '1'><#return "sa.types.Binary">
     <#elseif field.type?c == '2'><#return "db_types.Boolean">
     <#elseif field.type?c == '3'><#return "sa.types.SmallInteger">
@@ -105,7 +106,7 @@
 </#function>
 <#function getPythonType apply_to_pk field >
 <#-- @ftlvariable name="field" type="bbd.jportal2.Field" -->
-
+    <#if field.enums?size gt 0><#return "${field.name}Enum"></#if>
     <#assign prefix = ''>
     <#assign suffix = ''>
 
@@ -198,7 +199,38 @@
 
     <#return retVal>
 </#function>
+<#function GenerateProcName table proc>
+    <#local retVal ="DB_"+table.name+proc.name>
+    <#if proc.hasReturning><#local retVal += "Returning"></#if>
+    <#if proc.isData()><#local retVal += "StaticData"></#if>
+    <#return retVal >
+</#function>
+<#macro generateEnum parent field>
+    # Enum for ${field.name} field
+    class ${field.name}Enum(enum.Enum):
+    <#list field.enums as enum>
+        ${enum.name} = ${enum.value}
+    </#list>
 
+        @classmethod
+        def process_result_value_cls(cls, value, dialect):
+            return ${parent}.${field.name}Enum(value)
+
+        @classmethod
+        def process_bind_param_cls(cls, value, dialect):
+            return value.value
+
+        def process_bind_param(self, value, dialect):
+            return ${field.name}Enum.process_bind_param_cls(value, dialect)
+
+        def process_result_value(self, value, dialect):
+            return ${field.name}Enum.process_result_value_cls(value, dialect)
+
+        def copy(self, **kw):
+            return ${field.name}Enum(**kw)
+
+
+</#macro>
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List, Any, Optional
@@ -210,6 +242,7 @@ from sqlalchemy.sql.expression import TextAsFrom
 from bbdcommon.database.db_common import DBMixin, Base, DBColumn
 from bbdcommon.database import db_types
 from bbdcommon.database.processing import process_result_recs, process_result_rec, process_bind_params
+
 <#list table.getLinks() as link>
 <#if link.getName() != table.name>
 from .db_${link.getName()} import DB_${link.getName()}
@@ -224,26 +257,19 @@ from .db_${link.getName()} import DB_${link.getName()}
 
 <#function getConstructorSetList table>
 <#-- @ftlvariable name="table" type="bbd.jportal2.Table" -->
-    <#local fieldSetNames = table.fields?filter(field -> field.name?lower_case != 'tmstamp' && field.type != 10 && field.type != 14 && field.type != 24 && field.type != 25)?map(field -> field.name + "=" + field.name)>
+    <#local fieldSetNames = table.fields?filter(field -> field.name?lower_case != 'tmstamp' && field.type != 10 && field.type != 14 && field.type != 24 && field.type != 25)?map(field -> field.name + "=" + field.name + (field.enums?size gt 0)?then(".value if isinstance(${field.name}, enum.Enum) else ${field.name}",""))>
     <#return fieldSetNames?join(",\n            ")>
 </#function>
 
 ${table.getName()?upper_case}_SCHEMA = "${table.getDatabase().getSchema()?lower_case}"
-
-
 class DB_${table.name}(Base, DBMixin):
     <#list table.fields as field><#if field.enums?size gt 0>
-    # Enum for ${field.name} field
-    class ${table.name}${field.name}Enum(enum.Enum):
-        <#list field.enums as enum>
-        ${enum.name} = ${enum.value}
-        </#list>
-
+    <@generateEnum "DB_${table.name}" field/>
     </#if>
     </#list>
     <#list table.fields as field>
 <#--        <#if field.name?lower_case != 'tmstamp'>-->
-    ${field.name}: <#compress><#if field.enums?size gt 0>${table.name}${field.name}Enum<#else>${getPythonType(false, field)}</#if></#compress> = DBColumn("${field.name?lower_case}", <#compress>${getSQLAlchemyColumnType(field, table)}${getColumnAttributes(field, table)})</#compress>
+    ${field.name}: <#compress><#if field.enums?size gt 0>${field.name}Enum<#else>${getPythonType(false, field)}</#if></#compress> = DBColumn("${field.name?lower_case}", <#compress>${getSQLAlchemyColumnType(field, table)}${getColumnAttributes(field, table)})</#compress>
 <#--        </#if>-->
     </#list>
 <#--backref="F_${getFkName(link table)}"-->
@@ -266,32 +292,23 @@ class DB_${table.name}(Base, DBMixin):
 <#if (!proc.isBuiltIn() || database.flags?seq_contains("SQLAlchemy.generateBuiltIns"))>
 
 @dataclass
-class DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if><#if proc.isData()>StaticData</#if>:
+class ${GenerateProcName(table, proc)}:
     <#list proc.inputs as field><#if field.enums?size gt 0>
-    # Enum for ${field.name} field
-    class ${table.name}${proc.name}${field.name}Enum(enum.Enum):
-        <#list field.enums as enum>
-        ${enum.name} = ${enum.value}
-        </#list>
-
+        <@generateEnum GenerateProcName(table, proc) field />
     </#if>
     </#list>
     <#list proc.outputs as field><#if field.enums?size gt 0>
-    # Enum for ${field.name} field
-    class ${table.name}${proc.name}${field.name}Enum(enum.Enum):
-    <#list field.enums as enum>
-        ${enum.name} = ${enum.value}
-    </#list>
-
+    <@generateEnum GenerateProcName(table, proc) field />
     </#if>
     </#list>
+    <#if proc.outputs?size gt 0>#Outputs</#if>
     <#list proc.outputs as field>
-    ${field.name}: <#compress><#if field.enums?size gt 0>${table.name}${proc.name}${field.name}Enum<#else>${getPythonType(false, field)}</#if></#compress>
+    ${field.name}: <#compress><#if field.enums?size gt 0>${field.name}Enum<#else>${getPythonType(false, field)}</#if></#compress>
     </#list>
 
     @classmethod
     def get_statement(cls
-                     <#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
+                     <#list proc.inputs as field>, ${field.name}: <#if field.enums?size gt 0>${field.name}Enum<#else>${getPythonType(false, field)}</#if>
                      </#list><#list proc.dynamics as dynamic>, ${dynamic}: str</#list>) -> TextAsFrom:
         class _ret:
             sequence = "default," #postgres uses default for sequences
@@ -302,7 +319,7 @@ class DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if><#if pro
         statement = sa.text(<#list proc.lines as pl>
                         <#if pl.isVar()>f"{${pl.getUnformattedLine()}}"<#else>f"${pl.getUnformattedLine()?replace("^(_ret.*\\w)","{$1}","r")}"<#if pl.getUnformattedLine() == " ) "></#if></#if></#list>)
 
-        text_statement = statement.columns(<#list proc.outputs as field>${field.name}=${getSQLAlchemyBaseType(field)},
+        text_statement = statement.columns(<#list proc.outputs as field>${field.name}=${getSQLAlchemyBaseType(field, GenerateProcName(table, proc))},
                                       </#list>)
         <#--  statement = statement.columns(<#list proc.outputs as field>column('${field.name}'), \
                                     </#list>)  -->
@@ -313,11 +330,11 @@ class DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if><#if pro
         return text_statement
 
     @classmethod
-    def execute(cls, session: Session<#list proc.inputs as field>, ${field.name}: <#if field.enums?size gt 0>${table.name}${proc.name}${field.name}Enum<#else>${getPythonType(false, field)}</#if>
+    def execute(cls, session: Session<#list proc.inputs as field>, ${field.name}: <#if field.enums?size gt 0>${field.name}Enum<#else>${getPythonType(false, field)}</#if>
                      </#list><#list proc.dynamics as dynamic>, ${dynamic}: str</#list>) -> ${getTableReturnType(proc, "DB_" + table.name + proc.name + proc.hasReturning?then("Returning",""))}:
         <#if proc.inputs?size gt 0>
-        params = process_bind_params(session, [<#list proc.inputs as field>${getSQLAlchemyBaseType(field)},
-                                        </#list><#list proc.dynamics as dynamic>db_types.NonNullableString,</#list>], [<#list proc.inputs as field>${field.name},
+        params = process_bind_params(session, [<#list proc.inputs as field>${getSQLAlchemyBaseType(field,GenerateProcName(table, proc))},
+                                        </#list><#list proc.dynamics as dynamic>db_types.NonNullableString,</#list>], [<#list proc.inputs as field>${field.name}<#if field.enums?size gt 0>.value if isinstance(${field.name}, enum.Enum) else ${field.name}</#if>,
                                         </#list><#list proc.dynamics as dynamic>${dynamic},</#list>])
         </#if>
         res = session.execute(cls.get_statement(<#if proc.inputs?size gt 0>*params</#if>))
@@ -325,13 +342,13 @@ class DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if><#if pro
         rec = res.fetchone()
         if rec:
             res.close()
-            return process_result_rec(DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if>, session, [<#list proc.outputs as field>${getSQLAlchemyBaseType(field)},
+            return process_result_rec(DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if>, session, [<#list proc.outputs as field><#if field.enums?size gt 0>${GenerateProcName(table, proc)}.${field.name}Enum<#else>${getSQLAlchemyBaseType(field, proc)}</#if>,
                                         </#list>], rec)
 
         return None
         <#elseif proc.outputs?size gt 0>
         recs = res.fetchall()
-        return process_result_recs(DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if>, session, [<#list proc.outputs as field>${getSQLAlchemyBaseType(field)},
+        return process_result_recs(DB_${table.name}${proc.name}<#if proc.hasReturning>Returning</#if>, session, [<#list proc.outputs as field><#if field.enums?size gt 0>${GenerateProcName(table, proc)}.${field.name}Enum<#else>${getSQLAlchemyBaseType(field, proc)}</#if>,
                                         </#list>], recs)
         <#else>
         res.close()

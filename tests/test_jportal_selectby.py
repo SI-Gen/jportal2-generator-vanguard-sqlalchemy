@@ -4,7 +4,8 @@ from generated import DB_ToDoList
 @pytest.fixture
 def todolist_single_test_record():
     import datetime
-    return DB_ToDoList(ListName="LIST", ListType=1, Description="Desc", LastUpdated=datetime.date(2020, 1, 1))
+    # return DB_ToDoList(ListName="LIST", ListType=1, Description="Desc", LastUpdated=datetime.date(2020, 1, 1))
+    return DB_ToDoList(ListName="LIST", ListType=DB_ToDoList.ListTypeEnum.Private, Description="Desc", LastUpdated=datetime.date(2020, 1, 1))
 
 
 @pytest.fixture
@@ -30,7 +31,7 @@ def test_JPortalSelectOneBySimpleStandard(generate_jportal, postgres14p2_db, run
     rec = DB_ToDoListSelectOneByListName.execute(session, todolist_single_test_record.ListName)
 
     assert (rec.ListName == "LIST")
-    assert (rec.ListType == 1)
+    assert (rec.ListType == DB_ToDoListSelectOneByListName.ListTypeEnum.Private)
     assert (rec.Description == "Desc")
     assert (rec.LastUpdated == datetime.datetime(2020, 1, 1, 0, 0))
 
@@ -40,15 +41,15 @@ def test_JPortalSelectByReturningList(generate_jportal, postgres14p2_db, run_tak
     import datetime
 
     session = Session(postgres14p2_db)
-    rec1 = DB_ToDoList(ListName="LIST 1", ListType=999, Description="Desc 1", LastUpdated=datetime.date(2020, 1, 1))
-    rec2 = DB_ToDoList(ListName="LIST 2", ListType=999, Description="Desc 2", LastUpdated=datetime.date(2020, 1, 1))
+    rec1 = DB_ToDoList(ListName="LIST 1", ListType=DB_ToDoList.ListTypeEnum.Public, Description="Desc 1", LastUpdated=datetime.date(2020, 1, 1))
+    rec2 = DB_ToDoList(ListName="LIST 2", ListType=DB_ToDoList.ListTypeEnum.Public, Description="Desc 2", LastUpdated=datetime.date(2020, 1, 1))
 
     session.add(rec1)
     session.add(rec2)
 
     session.commit()
 
-    rec = DB_ToDoListSelectByListType.execute(session, 999)
+    rec = DB_ToDoListSelectByListType.execute(session, DB_ToDoList.ListTypeEnum.Public)
     assert( len(rec) == 2)
 
     assert (rec[0].ListName == "LIST 1")

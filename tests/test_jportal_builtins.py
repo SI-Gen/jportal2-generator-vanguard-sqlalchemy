@@ -6,8 +6,8 @@ def todolist_single_test_record():
     import datetime
     from generated import DB_ToDoList
 
-    # return DB_ToDoList(ListName="LIST", ListType=DB_ToDoList.ToDoListListTypeEnum.Private, Description="Desc", LastUpdated=datetime.date(2020, 1, 1))
-    return DB_ToDoList(ListName="LIST", ListType=1, Description="Desc", LastUpdated=datetime.date(2020, 1, 1))
+    return DB_ToDoList(ListName="LIST", ListType=DB_ToDoList.ListTypeEnum.Private, Description="Desc", LastUpdated=datetime.date(2020, 1, 1))
+    #return DB_ToDoList(ListName="LIST", ListType=1, Description="Desc", LastUpdated=datetime.date(2020, 1, 1))
 
 
 @pytest.fixture
@@ -28,7 +28,7 @@ def test_JPortalInsertReturning(generate_jportal, postgres14p2_db, run_takeons):
     session = Session(postgres14p2_db)
     rec = DB_ToDoListInsertReturning.execute(session,
                                              "JPortalInsert List",
-                                             1,
+                                             DB_ToDoListInsertReturning.ListTypeEnum.Private,
                                              "Jportal Insert List Description",
                                              datetime.datetime.now())
     session.commit()
@@ -83,7 +83,7 @@ def test_JPortalSelectOne(generate_jportal, postgres14p2_db, run_takeons, todoli
     rec = DB_ToDoListSelectOne.execute(session, todolist_single_test_record.ID)
 
     assert (rec.ListName == "LIST")
-    assert (rec.ListType == 1)
+    assert (rec.ListType == DB_ToDoListSelectOne.ListTypeEnum.Private)
     assert (rec.Description == "Desc")
     assert (rec.LastUpdated == datetime.datetime(2020, 1, 1, 0, 0))
 
@@ -168,6 +168,6 @@ def test_JPortalDynamicSQL(generate_jportal, postgres14p2_db, run_takeons, todol
                                                      f"ID = {todolist_single_test_record.ID}")
     rec = recs[0]
     assert (rec.ListName == "LIST")
-    assert (rec.ListType == 1)
+    assert (rec.ListType == DB_ToDoListSelectWithDynamicQuery.ListTypeEnum.Private)
     assert (rec.Description == "Desc")
     assert (rec.LastUpdated == datetime.datetime(2020, 1, 1, 0, 0))
