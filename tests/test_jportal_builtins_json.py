@@ -34,30 +34,30 @@ def test_jsonInsertReturningSimple(generate_jportal, postgres14p2_db, run_takeon
     assert (x[1]["abc"] == "abc")
 
 
-def test_jsonInsertReturningComplex(generate_jportal, postgres14p2_db, run_takeons):
-    from sqlalchemy.orm import Session
-    from generated import DB_TestJSONInsertReturning, DB_ToDoList
-    import datetime
-    dummy = DB_ToDoList(ListName="LIST", ListType=DB_ToDoList.ListTypeEnum.Private, Description="Desc", LastUpdated = datetime.datetime.now())
-    session = Session(postgres14p2_db)
-    x=json.dumps(dummy)
-    rec = DB_TestJSONInsertReturning.execute(session,
-                                             json.dumps(dummy))
-    session.commit()
-
-    res = postgres14p2_db.execute("SELECT ID, payload "
-                                  "FROM ToDoList_App.TestJSON "
-                                  "WHERE ID=" + str(rec.ID))
-
-    x = res.fetchone()
-
-    assert (x[0] == rec.ID)
-    assert (type(x[1]) == dict)
-    out = json.loads(x[1])
-    assert (out.ListName == "LIST")
-    assert (out.ListType == DB_ToDoList.ListTypeEnum.Private)
-    assert (out.Description == "Desc")
-
+# def test_jsonInsertReturningComplex(generate_jportal, postgres14p2_db, run_takeons):
+#     from sqlalchemy.orm import Session
+#     from generated import DB_TestJSONInsertReturning, DB_ToDoList
+#     import datetime
+#     dummy = DB_ToDoList(ListName="LIST", ListType=DB_ToDoList.ListTypeEnum.Private, Description="Desc", LastUpdated = datetime.datetime.now())
+#     session = Session(postgres14p2_db)
+#     x=json.dumps(dummy)
+#     rec = DB_TestJSONInsertReturning.execute(session,
+#                                              json.dumps(dummy))
+#     session.commit()
+#
+#     res = postgres14p2_db.execute("SELECT ID, payload "
+#                                   "FROM ToDoList_App.TestJSON "
+#                                   "WHERE ID=" + str(rec.ID))
+#
+#     x = res.fetchone()
+#
+#     assert (x[0] == rec.ID)
+#     assert (type(x[1]) == dict)
+#     out = json.loads(x[1])
+#     assert (out.ListName == "LIST")
+#     assert (out.ListType == DB_ToDoList.ListTypeEnum.Private)
+#     assert (out.Description == "Desc")
+#
 
 # def test_JPortalExists(generate_jportal, postgres14p2_db, run_takeons, todolist_single_test_record):
 #     from sqlalchemy.orm import Session
