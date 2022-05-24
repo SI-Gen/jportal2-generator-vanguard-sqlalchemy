@@ -14,7 +14,7 @@ def test_AlchemyInsert(generate_jportal, postgres14p2_db, run_takeons):
                       LastUpdated=datetime.datetime.now())
     session.add(lst)
     session.commit()
-
+    session.expunge_all()
     res = postgres14p2_db.execute("SELECT ListName,ListType,Description,LastUpdated "
                               "FROM ToDoList_App.ToDoList ")
                               #"WHERE ID="+str(lst.ID))
@@ -37,6 +37,7 @@ def test_AlchemySelectByPK(generate_jportal, postgres14p2_db, run_takeons):
                       LastUpdated=datetime.datetime.now())
     session.add(lst)
     session.commit()
+
     stmt = session.query(DB_ToDoList).get(lst.ID)
     res = session.execute(stmt)
     lst=res.fetchall()

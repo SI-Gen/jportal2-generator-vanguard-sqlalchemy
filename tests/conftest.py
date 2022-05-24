@@ -20,10 +20,11 @@ def postgres14p2_db():
 
 
 @pytest.fixture(scope="session")
-def generate_jportal():
+def generate_jportal(pytestconfig):
     client = docker.from_env()
     cwd = os.getcwd()
-    parent = os.path.dirname(cwd)
+    #parent = os.path.dirname(cwd)
+    parent = pytestconfig.rootpath
     print(parent)
     # client.containers.run("bbdsoftware/jportal2:latest",
     client.containers.run("ghcr.io/si-gen/jportal2:latest",
@@ -40,10 +41,10 @@ def generate_jportal():
 
 
 @pytest.fixture(scope="session")
-def run_takeons(postgres14p2_db):
+def run_takeons(pytestconfig, postgres14p2_db):
     cwd = os.getcwd()
-    parent = os.path.dirname(cwd)
-
+    #parent = os.path.dirname(cwd)
+    parent = pytestconfig.rootpath
     takeon = open(os.path.join(parent, "generated_sources", "generated_sql", "ExampleDatabase.sql")).readlines()
     takeon = ''.join([str(elem) for elem in takeon])
 
