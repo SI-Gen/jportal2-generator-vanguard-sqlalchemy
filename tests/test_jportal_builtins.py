@@ -20,7 +20,7 @@ def todoitem_single_test_record():
                         LastUpdated=datetime.datetime.now())
 
 
-def test_JPortalInsertReturning(generate_jportal, postgres14p2_db, run_takeons):
+def test_JPortalInsertReturning(postgres14p2_db):
     from sqlalchemy.orm import Session
     from generated import DB_ToDoListInsertReturning
     import datetime
@@ -42,7 +42,7 @@ def test_JPortalInsertReturning(generate_jportal, postgres14p2_db, run_takeons):
     assert (x[0] == rec.ID)
 
 
-def test_JPortalInsertWithoutReturning(generate_jportal, postgres14p2_db, run_takeons, todolist_single_test_record):
+def test_JPortalInsertWithoutReturning(postgres14p2_db, todolist_single_test_record):
     from sqlalchemy.orm import Session
     from generated import DB_ToDo_ItemInsert
     import datetime
@@ -70,7 +70,7 @@ def test_JPortalInsertWithoutReturning(generate_jportal, postgres14p2_db, run_ta
     assert (x[2] == "Description")
 
 
-def test_JPortalSelectOne(generate_jportal, postgres14p2_db, run_takeons, todolist_single_test_record):
+def test_JPortalSelectOne(postgres14p2_db, todolist_single_test_record):
     from sqlalchemy.orm import Session
     from generated import DB_ToDoListSelectOne
     import datetime
@@ -88,7 +88,7 @@ def test_JPortalSelectOne(generate_jportal, postgres14p2_db, run_takeons, todoli
     assert (rec.LastUpdated == datetime.datetime(2020, 1, 1, 0, 0))
 
 
-def test_JPortalExists(generate_jportal, postgres14p2_db, run_takeons, todolist_single_test_record):
+def test_JPortalExists(postgres14p2_db, todolist_single_test_record):
     from sqlalchemy.orm import Session
     from generated import DB_ToDoListExists
 
@@ -104,7 +104,7 @@ def test_JPortalExists(generate_jportal, postgres14p2_db, run_takeons, todolist_
     assert (rec.noOf == 0)
 
 
-def test_JPortalDeleteOne(generate_jportal, postgres14p2_db, run_takeons, todolist_single_test_record):
+def test_JPortalDeleteOne(postgres14p2_db, todolist_single_test_record):
     from sqlalchemy.orm import Session
     from generated import DB_ToDoListDeleteOne, DB_ToDoListSelectOne
 
@@ -123,7 +123,7 @@ def test_JPortalDeleteOne(generate_jportal, postgres14p2_db, run_takeons, todoli
     assert (rec is None)
 
 
-def test_JPortalUpdate(generate_jportal, postgres14p2_db, run_takeons, todolist_single_test_record,
+def test_JPortalUpdate(postgres14p2_db, todolist_single_test_record,
                        todoitem_single_test_record):
     from sqlalchemy.orm import Session
     from generated import DB_ToDo_ItemUpdate, DB_ToDo_ItemSelectOne
@@ -154,7 +154,7 @@ def test_JPortalUpdate(generate_jportal, postgres14p2_db, run_takeons, todolist_
     assert (rec.LastUpdated == datetime.datetime(2021, 1, 1, 0, 0))
 
 
-def test_JPortalDynamicSQL(generate_jportal, postgres14p2_db, run_takeons, todolist_single_test_record):
+def test_JPortalDynamicSQL(postgres14p2_db, todolist_single_test_record):
     from sqlalchemy.orm import Session
     from generated import DB_ToDoListSelectWithDynamicQuery
     import datetime

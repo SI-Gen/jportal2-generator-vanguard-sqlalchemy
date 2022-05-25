@@ -13,7 +13,7 @@ def json_single_test_record():
     return DB_TestJSON(Payload=simple_dict.__str__())
 
 
-def test_jsonInsertReturningSimple(generate_jportal, postgres14p2_db, run_takeons):
+def test_jsonInsertReturningSimple(postgres14p2_db):
     from sqlalchemy.orm import Session
     from generated import DB_TestJSONInsertReturning
     import datetime
