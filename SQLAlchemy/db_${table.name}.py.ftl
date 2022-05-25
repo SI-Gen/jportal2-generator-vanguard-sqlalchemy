@@ -296,7 +296,8 @@ class DB_${table.name}(Base, DBMixin):
         super(DB_${table.name}, self).__init__(
             ${getConstructorSetList(table)})
 <#list table.procs as proc>
-<#if (!proc.isBuiltIn() || database.flags?seq_contains("SQLAlchemy.generateBuiltIns"))>
+    # ${proc.name} ${proc.isBuiltIn()?string('yes','no')}
+<#if (!proc.isBuiltIn() || (proc.isBuiltIn() && !database.flags?seq_contains("SQLAlchemy.skipBuiltIns")))>
 
 @dataclass
 class ${GenerateProcName(table, proc)}:

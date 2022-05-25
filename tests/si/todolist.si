@@ -32,7 +32,7 @@ INPUT
     ID          =
 OUTPUT
     ListName    =
-    ListType    CHAR
+    ListType    CHAR(250)
 SQLCODE
     SELECT
         ListName,

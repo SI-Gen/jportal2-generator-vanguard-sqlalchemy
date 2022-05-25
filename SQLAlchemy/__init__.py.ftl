@@ -5,7 +5,7 @@
 <#list database.getTables() as table>
 from .db_${table.getName()} import DB_${table.getName()}
 <#list table.getProcs() as proc>
-<#if !proc.isBuiltIn() || database.flags?seq_contains("SQLAlchemy.generateBuiltIns")>
+<#if (!proc.isBuiltIn() || (proc.isBuiltIn() && !database.flags?seq_contains("SQLAlchemy.skipBuiltIns")))>
 from .db_${table.getName()} import DB_${table.getName()}${proc.name}<#if proc.hasReturning>Returning</#if>
 </#if>
 </#list>
@@ -20,7 +20,7 @@ ALL_TABLES = [
 ALL_PROCS = [
 <#list database.getTables()?sort as table>
     <#list table.getProcs()?sort as proc>
-<#if !proc.isBuiltIn() || database.flags?seq_contains("SQLAlchemy.generateBuiltIns")>
+<#if (!proc.isBuiltIn() || (proc.isBuiltIn() && !database.flags?seq_contains("SQLAlchemy.skipBuiltIns")))>
     DB_${table.getName()}${proc.name}<#if proc.hasReturning>Returning</#if>,
 </#if>
     </#list>
@@ -35,7 +35,7 @@ __all__ = [
 
 <#list database.getTables()?sort as table>
     <#list table.getProcs()?sort as proc>
-        <#if !proc.isBuiltIn() || database.flags?seq_contains("SQLAlchemy.generateBuiltIns")>
+<#if (!proc.isBuiltIn() || (proc.isBuiltIn() && !database.flags?seq_contains("SQLAlchemy.skipBuiltIns")))>
     "DB_${table.getName()}${proc.name}<#if proc.hasReturning>Returning</#if>",
         </#if>
     </#list>

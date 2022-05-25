@@ -7,7 +7,7 @@ import os
 
 
 @pytest.fixture(scope="session")
-def postgres14p2_db():
+def postgres14p2_db_clean():
     """
     Returns an open SQLAlchemy connection to a Postgres
     :return:
@@ -20,10 +20,11 @@ def postgres14p2_db():
 
 
 @pytest.fixture(scope="session")
-def generate_jportal():
+def generate_jportal(pytestconfig):
     client = docker.from_env()
     cwd = os.getcwd()
-    parent = os.path.dirname(cwd)
+    #parent = os.path.dirname(cwd)
+    parent = pytestconfig.rootpath
     print(parent)
     # client.containers.run("bbdsoftware/jportal2:latest",
     client.containers.run("ghcr.io/si-gen/jportal2:latest",
@@ -40,15 +41,18 @@ def generate_jportal():
 
 
 @pytest.fixture(scope="session")
-def run_takeons(postgres14p2_db):
+def postgres14p2_db(pytestconfig, generate_jportal, postgres14p2_db_clean):
     cwd = os.getcwd()
-    parent = os.path.dirname(cwd)
-
+    #parent = os.path.dirname(cwd)
+    parent = pytestconfig.rootpath
     takeon = open(os.path.join(parent, "generated_sources", "generated_sql", "ExampleDatabase.sql")).readlines()
     takeon = ''.join([str(elem) for elem in takeon])
 
-    postgres14p2_db.execute(text("CREATE SCHEMA todolist_app;"))
+    #postgres14p2_db_clean.execute(text("DROP SCHEMA IF EXISTS todolist_app;"))
+    postgres14p2_db_clean.execute(text("CREATE SCHEMA IF NOT EXISTS todolist_app;"))
     # postgres_db.execute(text("CREATE TABLE ToDoList_App.ToDoList ( ID serial )"))
     # postgres_db.execute(text("CREATE TABLE ToDoList_App.ToDo_item ( ID serial )"))
-    postgres14p2_db.execute(text(takeon))
+    postgres14p2_db_clean.execute(text(takeon))
+
+    return postgres14p2_db_clean
 

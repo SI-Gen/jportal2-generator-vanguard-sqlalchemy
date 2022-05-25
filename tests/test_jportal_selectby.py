@@ -18,7 +18,7 @@ def todoitem_single_test_record():
                         LastUpdated=datetime.datetime.now())
 
 
-def test_JPortalSelectOneBySimpleStandard(generate_jportal, postgres14p2_db, run_takeons, todolist_single_test_record):
+def test_JPortalSelectOneBySimpleStandard(postgres14p2_db, todolist_single_test_record):
     from sqlalchemy.orm import Session
     from generated import DB_ToDoListSelectOneByListName
     import datetime
@@ -35,7 +35,7 @@ def test_JPortalSelectOneBySimpleStandard(generate_jportal, postgres14p2_db, run
     assert (rec.Description == "Desc")
     assert (rec.LastUpdated == datetime.datetime(2020, 1, 1, 0, 0))
 
-def test_JPortalSelectByReturningList(generate_jportal, postgres14p2_db, run_takeons):
+def test_JPortalSelectByReturningList(postgres14p2_db):
     from sqlalchemy.orm import Session
     from generated import DB_ToDoListSelectByListType
     import datetime
@@ -55,7 +55,7 @@ def test_JPortalSelectByReturningList(generate_jportal, postgres14p2_db, run_tak
     assert (rec[0].ListName == "LIST 1")
     assert (rec[1].ListName == "LIST 2")
 
-def test_JPortalSelectByReturningCustomFields(generate_jportal, postgres14p2_db, run_takeons):
+def test_JPortalSelectByReturningCustomFields(postgres14p2_db):
     from sqlalchemy.orm import Session
     from generated import DB_ToDoListSelectIDByListType
     import datetime
