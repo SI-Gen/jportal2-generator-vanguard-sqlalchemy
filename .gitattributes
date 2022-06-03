@@ -5,3 +5,4 @@ Pipfile export-ignore
 Pipfile.lock export-ignore
 pytest.ini export-ignore
 README.md export-ignore
+.gitattributes export-ignore
