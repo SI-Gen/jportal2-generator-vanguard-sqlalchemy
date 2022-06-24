@@ -5,7 +5,7 @@
 
 <#function getSQLAlchemyColumnType field table>
 <#--    <#if field.enums?size gt 0><#return "EnumAsSmallInteger()"></#if>-->
-    <#if field.type?c == '1'><#return "sa.Binary()">
+    <#if field.type?c == '1'><#return "sa.LargeBinary()">
     <#elseif field.type?c == '2'><#return "db_types.Boolean()">
     <#elseif field.type?c == '3'><#return "sa.SmallInteger()">
     <#elseif field.type?c == '4' && field.isNull()><#return "sa.String(length=#{field.length; M0})">
@@ -40,7 +40,7 @@
 </#function>
 <#function getSQLAlchemyBaseType field procname>
 <#--    <#if field.enums?size gt 0><#return "EnumAsSmallInteger()"></#if>&ndash;&gt;-->
-    <#if field.type?c == '1'><#return "sa.types.Binary">
+    <#if field.type?c == '1'><#return "sa.types.LargeBinary">
     <#elseif field.type?c == '2'><#return "db_types.Boolean">
     <#elseif field.type?c == '3'><#return "sa.types.SmallInteger">
     <#elseif field.type?c == '4' && field.isNull()><#return "sa.types.String">
@@ -57,7 +57,7 @@
     <#elseif field.type?c == '15'><#return "sa.types.SmallInteger">
     <#elseif field.type?c == '17'><#return "sa.types.DateTime">
     <#elseif field.type?c == '18'><#return "sa.types.DateTime">
-    <#elseif field.type?c == '19'><#return "sa.types.Binary">
+    <#elseif field.type?c == '19'><#return "sa.types.LargeBinary">
     <#elseif field.type?c == '20'><#return "sa.types.DateTime">
     <#elseif field.type?c == '21'><#return "sa.types.String">
     <#elseif field.type?c == '23'><#return "sa.types.String">
