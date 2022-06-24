@@ -57,7 +57,7 @@
     <#elseif field.type?c == '15'><#return "sa.types.SmallInteger">
     <#elseif field.type?c == '17'><#return "sa.types.DateTime">
     <#elseif field.type?c == '18'><#return "sa.types.DateTime">
-    <#elseif field.type?c == '19'><#return "sa.types.LargeBinary">
+    <#elseif field.type?c == '19'><#return "sa.types.Text">
     <#elseif field.type?c == '20'><#return "sa.types.DateTime">
     <#elseif field.type?c == '21'><#return "sa.types.String">
     <#elseif field.type?c == '23'><#return "sa.types.String">
