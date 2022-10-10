@@ -31,3 +31,5 @@ OUTPUT
     ItemDescription     =
     LastUpdated         =
 
+
+PROC UpdateBy ItemName SET ItemName ItemDescription 

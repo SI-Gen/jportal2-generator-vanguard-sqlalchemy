@@ -325,7 +325,7 @@ class ${GenerateProcName(table, proc)}:
             #session.bind.dialect.name
 
         statement = sa.text(<#list proc.lines as pl>
-                        <#if pl.isVar()>f"{${pl.getUnformattedLine()}}"<#else>f"${pl.getUnformattedLine()?replace("^(_ret.*\\w)","{$1}","r")}"<#if pl.getUnformattedLine() == " ) "></#if></#if></#list>)
+                        f"${pl.getDecoratedLine()}"</#list>)
 
         text_statement = statement.columns(<#list proc.outputs as field>${field.name}=${getSQLAlchemyBaseType(field, GenerateProcName(table, proc))},
                                       </#list>)
