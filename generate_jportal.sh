@@ -5,9 +5,10 @@ docker run --rm -v ${PWD}:/local bbdsoftware/jportal2-testnew:latest \
                       --inputdir=/local/tests/si \
                       --template-location=/local \
                       --flag SQLAlchemy.generateBuiltIns \
+                      --flag Gerardt.Magic=ABC \
                       --template-generator \
                         SQLAlchemy:/local/generated_sources/generated \
                       --builtin-generator \
                       PostgresDDL:/local/generated_sources/generated_sql \
-                      --properties-file=/local/jportal_template.properties \
+                      --properties-file=/local/jportal_postgres.properties \
                       --debug=TRUE
