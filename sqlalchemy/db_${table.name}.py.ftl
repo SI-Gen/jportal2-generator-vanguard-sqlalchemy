@@ -249,6 +249,7 @@ from sqlalchemy.sql.expression import TextAsFrom
 from bbdcommon.database.db_common import DBMixin, Base, DBColumn
 from bbdcommon.database import db_types
 from bbdcommon.database.processing import process_result_recs, process_result_rec, process_bind_params
+from .insert_returning_helper import InsertReturnHelper
 
 <#list table.getLinks() as link>
 <#if link.getName() != table.name>
@@ -316,13 +317,13 @@ class ${GenerateProcName(table, proc)}:
 
     @classmethod
     def get_statement(cls
+                     , dialect_name: str
                      <#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
                      </#list><#list proc.dynamics as dynamic>, ${dynamic}: str</#list>) -> TextAsFrom:
-        class _ret:
-            sequence = "default," #postgres uses default for sequences
-            output = <#if proc.isInsert()==false && proc.outputs?size gt 0>" OUTPUT (<#list proc.outputs as x>${x.name}<#sep>,</#list>)"<#else>""</#if>
-            tail = <#if proc.outputs?size gt 0>" RETURNING <#list proc.outputs as x>${x.name}<#sep> </#list>"<#else>""</#if>
-            #session.bind.dialect.name
+        _ret: InsertReturnHelper = \
+            InsertReturnHelper.get(dialect_name)(<#if proc.isInsert()>True<#else>False</#if>, [
+                <#list proc.outputs as x>"${x.name}"<#sep>,
+            </#list>])
 
         statement = sa.text(<#list proc.lines as pl>
                         <#if pl.isVar()>f"{${pl.getUnformattedLine()}}"<#else>f"${pl.getUnformattedLine()?replace("^(_ret.*\\w)","{$1}","r")}"<#if pl.getUnformattedLine() == " ) "></#if></#if></#list>)
@@ -338,14 +339,17 @@ class ${GenerateProcName(table, proc)}:
         return text_statement
 
     @classmethod
-    def execute(cls, session: Session<#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
-                     </#list><#list proc.dynamics as dynamic>, ${dynamic}: str</#list>) -> ${getTableReturnType(proc, GenerateProcName(table, proc))}:
+    def execute(cls
+                , session: Session
+                <#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
+                </#list><#list proc.dynamics as dynamic>, ${dynamic}: str</#list>) -> ${getTableReturnType(proc, GenerateProcName(table, proc))}:
         <#if proc.inputs?size gt 0>
         params = process_bind_params(session, [<#list proc.inputs as field>${getSQLAlchemyBaseType(field,GenerateProcName(table, proc))},
                                         </#list><#list proc.dynamics as dynamic>db_types.NonNullableString,</#list>], [<#list proc.inputs as field>${field.name}<#if field.enums?size gt 0>.value if isinstance(${field.name}, enum.Enum) else ${field.name}</#if>,
                                         </#list><#list proc.dynamics as dynamic>${dynamic},</#list>])
         </#if>
-        res = session.execute(cls.get_statement(<#if proc.inputs?size gt 0>*params</#if>))
+        statement = cls.get_statement(session.bind.dialect.name, <#if proc.inputs?size gt 0>*params</#if>)
+        res = session.execute(statement)
         <#if proc.isSingle()>
         rec = res.fetchone()
         if rec:
