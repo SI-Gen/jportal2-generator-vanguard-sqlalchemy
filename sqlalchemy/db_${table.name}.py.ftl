@@ -246,9 +246,9 @@ import sqlalchemy as sa
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import TextAsFrom
 
-from common.db_common import DBMixin, Base, DBColumn
-from comoon import db_types
-from common.processing import process_result_recs, process_result_rec, process_bind_params
+from .common.db_common import DBMixin, Base, DBColumn
+from .common import db_types
+from .common.processing import process_result_recs, process_result_rec, process_bind_params
 
 <#list table.getLinks() as link>
 <#if link.getName() != table.name>
