@@ -25,18 +25,18 @@ def generate_jportal(pytestconfig):
     cwd = os.getcwd()
     #parent = os.path.dirname(cwd)
     parent = pytestconfig.rootpath
-    print(parent)
+    print("XXX:",parent)
     # client.containers.run("bbdsoftware/jportal2:latest",
     client.containers.run("ghcr.io/si-gen/jportal2:latest",
-                          "--inputdir=/local/tests/si \
-                          --template-location=/local \
-                          --flag SQLAlchemy.generateBuiltIns \
-                          --template-generator \
-                            SQLAlchemy:/local/generated_sources/generated \
-                          --builtin-generator \
-                            PostgresDDL:/local/generated_sources/generated_sql",
+                          # "--inputdir=/local/tests/si \
+                          # --template-location=/local \
+                          # --flag SQLAlchemy.generateBuiltIns \
+                          # --template-generator \
+                          #   SQLAlchemy:/local/generated_sources/generated \
+                          # --builtin-generator \
+                          #   PostgresDDL:/local/generated_sources/generated_sql",
                           auto_remove=True,
-                          volumes=[f'{parent}:/local']
+                          # volumes=[f'{parent}:/local']
                           )
 
 

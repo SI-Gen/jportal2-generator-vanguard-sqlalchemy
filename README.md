@@ -1,6 +1,11 @@
 # jportal2-generator-vanguard-sqlalchemy
 This is a JPortal2 generator that generates SQLAlchemy-based database access for the Vanguard framework
 
+**NOTE THE FOLLOWING BREAKING CHANGE in v2.0 and up!**  
+**By default we no longer generate the SQLAlchemy Base Mixins, only the usual JPortal PROCS.**  
+If you want to generate the SQLAlchemy Base Mixins, add the `SQLAlchemy.generateSQLAlchemyBase` flags to your 
+generation command-line. See below for an example. 
+
 Usage:
 ======
 
@@ -17,7 +22,7 @@ curl -fsSL https://github.com/SI-Gen/jportal2-generatoror-vanguard-sqlalchemy/re
 java -jar jportal.jar \
         --inputdir=<input_directory> \
         --template-location=<template_directory> \
-        --flag SQLAlchemy.generateBuiltIns \
+        --flag SQLAlchemy.generateSQLAlchemyBase \
         --template-generator \
           SQLAlchemy:<output_directory>
 
@@ -28,10 +33,40 @@ Output:
 Flags:
 =====
 
-- SQLAlchemy.generateBuiltIns
-Generates the built-in PROC's like Insert, SelectOne, Update, SelectBy etc.
+- **SQLAlchemy.skipBuiltIns**  
+Don't generate the built-in PROC's like Insert, SelectOne, Update, SelectBy etc.
+- **SQLAlchemy.generateSQLAlchemyBase** *(since v2.0)*   
+Generate the SQLAlchemy Base Mixin classes `class DB_${table.name}(Base, DBMixin)` like below:  
+```python
+TODOLIST_SCHEMA = "todolist_app"
+class DB_ToDoList(Base, DBMixin):
+  # Enum for ListType field
+  class ListTypeEnum(enum.Enum):
+    Private = 1
+    Public = 2
 
-Usage in Python code:
+    @classmethod
+    def process_result_value_cls(cls, value, dialect):
+      return DB_ToDoList.ListTypeEnum(value)
+
+
+  ID: int = DBColumn("id", sa.Integer(), sa.Sequence("todolist_id_seq", metadata=Base.metadata, schema=TODOLIST_SCHEMA), primary_key=True, autoincrement=False)
+  ListName: str = DBColumn("listname", db_types.NonNullableString(length=255))
+  ListType: ListTypeEnum = DBColumn("listtype", sa.SmallInteger())
+  Description: str = DBColumn("description", db_types.NonNullableString(length=255))
+  LastUpdated: datetime = DBColumn("lastupdated", sa.DateTime(), default=datetime.now, onupdate=datetime.now)
+
+  __schema__ = TODOLIST_SCHEMA
+
+  def __init__(self, ListName: str, ListType: ListTypeEnum, Description: str, LastUpdated: datetime):
+    super(DB_ToDoList, self).__init__(
+      ListName=ListName,
+      ListType=ListType.value if isinstance(ListType, enum.Enum) else ListType,
+      Description=Description,
+      LastUpdated=LastUpdated)
+```
+
+- Usage in Python code:
 =====================
 
 This generated code leverages SQLAlchemy.

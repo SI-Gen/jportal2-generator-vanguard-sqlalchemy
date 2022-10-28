@@ -268,6 +268,7 @@ from .db_${link.getName()} import DB_${link.getName()}
     <#return fieldSetNames?join(",\n            ")>
 </#function>
 
+<#if (database.flags?seq_contains("SQLAlchemy.generateSQLAlchemyBase"))>
 ${table.getName()?upper_case}_SCHEMA = "${table.getDatabase().getSchema()?lower_case}"
 class DB_${table.name}(Base, DBMixin):
     <#list table.fields as field><#if field.enums?size gt 0>
@@ -295,8 +296,8 @@ class DB_${table.name}(Base, DBMixin):
     def __init__(self${getConstructorList(table)}):
         super(DB_${table.name}, self).__init__(
             ${getConstructorSetList(table)})
+</#if>
 <#list table.procs as proc>
-    # ${proc.name} ${proc.isBuiltIn()?string('yes','no')}
 <#if (!proc.isBuiltIn() || (proc.isBuiltIn() && !database.flags?seq_contains("SQLAlchemy.skipBuiltIns")))>
 
 @dataclass

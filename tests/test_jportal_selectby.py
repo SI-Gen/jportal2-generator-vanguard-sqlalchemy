@@ -34,6 +34,7 @@ def test_JPortalSelectOneBySimpleStandard(postgres14p2_db, todolist_single_test_
     assert (rec.ListType == DB_ToDoListSelectOneByListName.ListTypeEnum.Private)
     assert (rec.Description == "Desc")
     assert (rec.LastUpdated == datetime.datetime(2020, 1, 1, 0, 0))
+    session.commit()
 
 def test_JPortalSelectByReturningList(postgres14p2_db):
     from sqlalchemy.orm import Session
@@ -54,6 +55,7 @@ def test_JPortalSelectByReturningList(postgres14p2_db):
 
     assert (rec[0].ListName == "LIST 1")
     assert (rec[1].ListName == "LIST 2")
+    session.commit()
 
 def test_JPortalSelectByReturningCustomFields(postgres14p2_db):
     from sqlalchemy.orm import Session
@@ -74,8 +76,8 @@ def test_JPortalSelectByReturningCustomFields(postgres14p2_db):
     assert (rec[0].ID == rec1.ID)
     assert (rec[1].ID == rec2.ID)
 
-    assert(False)
     # Finally, check that only the ID field is generated
     assert(not hasattr(DB_ToDoListSelectIDByListType, 'ListType'))
     assert(not hasattr(DB_ToDoListSelectIDByListType, 'Description'))
     assert(not hasattr(DB_ToDoListSelectIDByListType, 'LastUpdated'))
+    session.commit()
