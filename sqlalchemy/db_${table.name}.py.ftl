@@ -5,6 +5,14 @@
 
 <#function getSQLAlchemyColumnType field table>
 <#--    <#if field.enums?size gt 0><#return "EnumAsSmallInteger()"></#if>-->
+    <#if field.enums?size gt 0>
+        <#if field.type?c == '3'><#return "db_types.IntEnum(${field.name}Enum)">
+        <#elseif field.type?c == '10'><#return "db_types.IntEnum(${field.name}Enum)">
+        <#elseif field.type?c == '11'><#return "db_types.IntEnum(${field.name}Enum)">
+        <#elseif field.type?c == '14'><#return "db_types.IntEnum(${field.name}Enum)">
+        <#elseif field.type?c == '15'><#return "db_types.IntEnum(${field.name}Enum)">
+        </#if>
+    </#if>
     <#if field.type?c == '1'><#return "sa.LargeBinary()">
     <#elseif field.type?c == '2'><#return "db_types.Boolean()">
     <#elseif field.type?c == '3'><#return "sa.SmallInteger()">

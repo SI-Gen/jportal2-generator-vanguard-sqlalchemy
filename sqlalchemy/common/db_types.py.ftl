@@ -1,3 +1,6 @@
+import enum
+
+from typing import Type
 from sqlalchemy import types
 
 
@@ -71,3 +74,22 @@ class Boolean(types.TypeDecorator):
     @property
     def python_type(self) -> type:
         return bool
+
+
+class IntEnum(types.TypeDecorator):
+    impl = types.Integer
+
+    enum_type: Type[enum.IntEnum]
+
+    def __init__(self, enum_type: Type[enum.IntEnum]) -> None:
+        super().__init__()
+        self.enum_type = enum_type
+
+    def process_bind_param(self, value: enum.IntEnum, dialect):
+        return value.value
+
+    def process_result_value(self, value: int, dialect):
+        return self.enum_type(value)
+
+    def copy(self, **kw):
+        return IntEnum(self.enum_type)
