@@ -222,7 +222,7 @@
 </#function>
 <#macro generateEnum parent field>
     # Enum for ${field.name} field
-    class ${field.name}Enum(enum.Enum):
+    class ${field.name}Enum(enum.IntEnum):
     <#list field.enums as enum>
         ${enum.name} = ${enum.value}
     </#list>
@@ -230,6 +230,10 @@
         @classmethod
         def process_result_value_cls(cls, value, dialect):
             return ${parent}.${field.name}Enum(value)
+
+        @classmethod
+        def process_bind_param_cls(cls, value, dialect):
+            return value.value
 <#---->
 <#--        @classmethod-->
 <#--        def process_bind_param_cls(cls, value, dialect):-->
@@ -272,7 +276,7 @@ from .db_${link.getName()} import DB_${link.getName()}
 
 <#function getConstructorSetList table>
 <#-- @ftlvariable name="table" type="bbd.jportal2.Table" -->
-    <#local fieldSetNames = table.fields?filter(field -> field.name?lower_case != 'tmstamp' && field.type != 10 && field.type != 14 && field.type != 24 && field.type != 25)?map(field -> field.name + "=" + field.name + (field.enums?size gt 0)?then(".value if isinstance(${field.name}, enum.Enum) else ${field.name}",""))>
+    <#local fieldSetNames = table.fields?filter(field -> field.name?lower_case != 'tmstamp' && field.type != 10 && field.type != 14 && field.type != 24 && field.type != 25)?map(field -> field.name + "=" + field.name)>
     <#return fieldSetNames?join(",\n            ")>
 </#function>
 
@@ -351,7 +355,7 @@ class ${GenerateProcName(table, proc)}:
                      </#list><#list proc.dynamics as dynamic>, ${dynamic}: str</#list>) -> ${getTableReturnType(proc, GenerateProcName(table, proc))}:
         <#if proc.inputs?size gt 0>
         params = process_bind_params(session, [<#list proc.inputs as field>${getSQLAlchemyBaseType(field,GenerateProcName(table, proc))},
-                                        </#list><#list proc.dynamics as dynamic>db_types.NonNullableString,</#list>], [<#list proc.inputs as field>${field.name}<#if field.enums?size gt 0>.value if isinstance(${field.name}, enum.Enum) else ${field.name}</#if>,
+                                        </#list><#list proc.dynamics as dynamic>db_types.NonNullableString,</#list>], [<#list proc.inputs as field>${field.name}<#if field.enums?size gt 0>.value if isinstance(${field.name}, enum.IntEnum) else ${field.name}</#if>,
                                         </#list><#list proc.dynamics as dynamic>${dynamic},</#list>])
         </#if>
         res = session.execute(cls.get_statement(<#if proc.inputs?size gt 0>*params</#if>))
