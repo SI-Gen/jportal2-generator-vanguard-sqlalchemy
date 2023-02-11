@@ -86,9 +86,7 @@
 <#-- @ftlvariable name="table" type="bbd.jportal2.Table" -->
     <#local retVal = "">
     <#if field.type?c == '14' || field.type?c == '24'>
-<#--        <#local retVal = retVal + ', sa.Sequence("' + table.getName()?upper_case + 'SEQ", metadata=Base.metadata, schema=${table.getName()?upper_case}_SCHEMA)'>-->
-        <#local retVal = retVal + ', sa.Sequence("' + table.getName()?lower_case + "_" + field.name?lower_case + '_seq", metadata=Base.metadata, schema=${table.getName()?upper_case}_SCHEMA)'>
-
+        <#local retVal = retVal + ', sa.Sequence("' + table.getName()?upper_case + 'SEQ", metadata=Base.metadata, schema=${table.getName()?upper_case}_SCHEMA)'>
     </#if>
     <#if table.getLinkForField(field)??>
         <#assign link = table.getLinkForField(field)>
