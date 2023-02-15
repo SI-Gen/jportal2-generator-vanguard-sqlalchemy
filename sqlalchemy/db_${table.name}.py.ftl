@@ -131,7 +131,7 @@
     <#elseif field.type?c == '4'><#return prefix + "str" + suffix>
     <#elseif field.type?c == '5'><#return prefix + "datetime" + suffix>
     <#elseif field.type?c == '6'><#return prefix + "datetime" + suffix>
-    <#elseif field.type?c == '7'><#return prefix + "double" + suffix>
+    <#elseif field.type?c == '7'><#return prefix + "float" + suffix>
     <#elseif field.type?c == '9'><#return prefix + "float" + suffix>
     <#elseif field.type?c == '10'><#return prefix + "int" + suffix>
     <#elseif field.type?c == '11'><#return prefix + "int" + suffix>
