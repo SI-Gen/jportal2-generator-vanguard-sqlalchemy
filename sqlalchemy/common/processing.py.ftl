@@ -3,9 +3,9 @@ def process_bind_params(session, types, params):
     dialect = session.bind.dialect
 
     for i in range(len(params)):
-        type = types[i]
-        if hasattr(type, "process_bind_param_cls"):
-            processed_params.append(type.process_bind_param_cls(params[i], dialect))
+        i_type = types[i]
+        if hasattr(i_type, "process_bind_param_cls"):
+            processed_params.append(i_type.process_bind_param_cls(params[i], dialect))
         else:
             processed_params.append(params[i])
 
@@ -17,9 +17,9 @@ def process_result_rec(cls, session, types, rec):
     dialect = session.bind.dialect
 
     for i in range(len(rec)):
-        type = types[i]
-        if hasattr(type, "process_result_value_cls"):
-            processed_rec.append(type.process_result_value_cls(rec[i], dialect))
+        i_type = types[i]
+        if hasattr(i_type, "process_result_value_cls"):
+            processed_rec.append(i_type.process_result_value_cls(rec[i], dialect))
         else:
             processed_rec.append(rec[i])
 
