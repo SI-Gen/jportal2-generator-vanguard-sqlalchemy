@@ -220,9 +220,10 @@
 </#function>
 <#macro generateEnum parent field>
     # Enum for ${field.name} field
-    class ${field.name}Enum(enum.IntEnum):
+    <#-- 21 = ansichr, 28 = wansichar-->
+    class ${field.name}Enum( <#if field.type?c == '28' || field.type?c == '21'>enum.Enum<#else>enum.IntEnum</#if>):
     <#list field.enums as enum>
-        ${enum.name} = ${enum.value}
+        ${enum.name} = <#if field.type?c == '28' || field.type?c == '21'>'${enum.getChar()}'<#else>${enum.getValue()}</#if>
     </#list>
 
         @classmethod

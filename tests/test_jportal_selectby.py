@@ -63,15 +63,15 @@ def test_JPortalSelectByReturningCustomFields(postgres14p2_db):
     import datetime
 
     session = Session(postgres14p2_db)
-    rec1 = DB_ToDoList(ListName="LIST 1", ListType=888, Description="Desc 1", LastUpdated=datetime.date(2020, 1, 1))
-    rec2 = DB_ToDoList(ListName="LIST 2", ListType=888, Description="Desc 2", LastUpdated=datetime.date(2020, 1, 1))
+    rec1 = DB_ToDoList(ListName="LIST 1", ListType=DB_ToDoList.ListTypeEnum.Custom, Description="Desc 1", LastUpdated=datetime.date(2020, 1, 1))
+    rec2 = DB_ToDoList(ListName="LIST 2", ListType=DB_ToDoList.ListTypeEnum.Custom, Description="Desc 2", LastUpdated=datetime.date(2020, 1, 1))
 
     session.add(rec1)
     session.add(rec2)
 
     session.commit()
 
-    rec = DB_ToDoListSelectIDByListType.execute(session, 888)
+    rec = DB_ToDoListSelectIDByListType.execute(session, DB_ToDoList.ListTypeEnum.Custom)
     assert( len(rec) == 2)
     assert (rec[0].ID == rec1.ID)
     assert (rec[1].ID == rec2.ID)

@@ -6,7 +6,7 @@ SCHEMA ToDoList_App
 TABLE ToDoList
    ID               IDENTITY
    ListName         CHAR(255)
-   ListType         SHORT (Private=1, Public=2)
+   ListType         SHORT (Private=1, Public=2, Custom=3)
    Description      CHAR(255)
    LastUpdated      TIMESTAMP
 
