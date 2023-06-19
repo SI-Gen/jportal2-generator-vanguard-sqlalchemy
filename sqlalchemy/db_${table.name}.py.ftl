@@ -90,7 +90,7 @@
     </#if>
     <#if table.getLinkForField(field)??>
         <#assign link = table.getLinkForField(field)>
-        <#if link.getName() != table.name>
+        <#if link.getName() != table.name && link.getFirstLinkField()??>
         <#local retVal = retVal + ", sa.ForeignKey(DB_" + link.getName() + "." + link.getFirstLinkField() + ")">
         </#if>
     </#if>
