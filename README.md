@@ -15,14 +15,14 @@ Usage:
 cd <template_directory>
 
 #Download version $VERSION template
-SQLALCHEMY_TEMPLATE_VERSION=1.2
-curl -fsSL https://github.com/SI-Gen/jportal2-generatoror-vanguard-sqlalchemy/releases/tag/$SQLALCHEMY_TEMPLATE_VERSION/jportal2-generator-vanguardg-sqlalchemy-$SQLALCHEMY_TEMPLATE_VERSION.zip > sqlalchemy.zip && unzip sqlalchemy.zip && rm sqlalchemy.zip
+SQLALCHEMY_TEMPLATE_VERSION=2.6
 
 #Run JPortal2
 java -jar jportal.jar \
         --inputdir=<input_directory> \
         --template-location=<template_directory> \
         --flag SQLAlchemy.generateSQLAlchemyBase \
+        --download-template "SQLAlchemy:https://github.com/SI-Gen/jportal2-generator-vanguard-sqlalchemy/archive/refs/tags/$SQLALCHEMY_TEMPLATE_VERSION.zip|stripBaseDir"
         --template-generator \
           SQLAlchemy:<output_directory>
 
