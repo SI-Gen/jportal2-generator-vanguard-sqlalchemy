@@ -354,7 +354,7 @@ class ${GenerateProcName(table, proc)}:
                      </#list><#list proc.dynamics as dynamic>, ${dynamic}: str</#list>) -> ${getTableReturnType(proc, GenerateProcName(table, proc))}:
         <#if proc.inputs?size gt 0>
         params = process_bind_params(session, [<#list proc.inputs as field>${getSQLAlchemyBaseType(field,GenerateProcName(table, proc))},
-                                        </#list><#list proc.dynamics as dynamic>db_types.NonNullableString,</#list>], [<#list proc.inputs as field>${field.name}<#if field.enums?size gt 0>.value if isinstance(${field.name}, enum.IntEnum) else ${field.name}</#if>,
+                                        </#list><#list proc.dynamics as dynamic>db_types.NonNullableString,</#list>], [<#list proc.inputs as field>${field.name}<#if field.enums?size gt 0>.value if isinstance(${field.name}, <#if field.type?c == '28' || field.type?c == '21'>enum.Enum<#else>enum.IntEnum</#if>) else ${field.name}</#if>,
                                         </#list><#list proc.dynamics as dynamic>${dynamic},</#list>])
         </#if>
         res = session.execute(cls.get_statement(<#if proc.inputs?size gt 0>*params</#if>))

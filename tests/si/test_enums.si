@@ -5,7 +5,8 @@ SCHEMA ToDoList_App
 
 TABLE TestEnum
    ID               IDENTITY
-   NodeType         ansichar (Normal='N',Error='E',Completed='C',DeadLetter='D', Storage='S', Fail='F') //Note: this field gets used for archiving.
+   NodeTypeCharEn   ansichar (Normal='N',Error='E',Completed='C',DeadLetter='D', Storage='S', Fail='F') //Note: this field gets used for archiving.
+   IntEn            INT (First=1, Second=2)
 
 KEY PKEY PRIMARY
     ID
