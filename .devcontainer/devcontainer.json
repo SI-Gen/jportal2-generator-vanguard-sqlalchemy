@@ -1,0 +1,52 @@
+{
+  "name": "Python 3.9 (uv)",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true,
+      "dockerDashComposeVersion": "v2",
+      "enableNonRootDocker": true
+    }
+  },
+  "containerEnv": {
+    "UV_LINK_MODE": "copy",
+    "UV_PYTHON_INSTALL_DIR": "/usr/local/share/uv/python",
+    "UV_PYTHON_PREFERENCE": "only-managed"
+  },
+  "postCreateCommand": "uv sync --frozen",
+  "remoteUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.debugpy",
+        "anysphere.cursorpyright",
+        "charliermarsh.ruff",
+        "tamasfe.even-better-toml",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python",
+        "python.terminal.activateEnvironment": true,
+        "python.languageServer": "None",
+        "python.testing.pytestEnabled": true,
+        "python.testing.unittestEnabled": false,
+        "python.testing.pytestArgs": ["tests"],
+        "python-envs.defaultEnvManager": "ms-python.python:uv",
+        "python-envs.defaultPackageManager": "ms-python.python:uv",
+        "cursorpyright.analysis.extraPaths": ["generated_sources"],
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.formatOnSave": true,
+          "editor.codeActionsOnSave": {
+            "source.organizeImports.ruff": "explicit"
+          }
+        }
+      }
+    }
+  }
+}
