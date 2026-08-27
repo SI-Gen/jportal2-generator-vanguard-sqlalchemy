@@ -6,6 +6,7 @@ from sqlalchemy import types
 
 class NonNullableString(types.TypeDecorator):
     impl = types.String
+    cache_ok = True
 
     @classmethod
     def process_bind_param_cls(cls, value, dialect):
