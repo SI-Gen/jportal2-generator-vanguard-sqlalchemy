@@ -352,12 +352,12 @@ class ${GenerateProcName(table, proc)}:
     @classmethod
     def execute(cls, session: Session<#list proc.inputs as field>, ${field.name}: ${getPythonType(false, field)}
                      </#list><#list proc.dynamics as dynamic>, ${dynamic}: str</#list>) -> ${getTableReturnType(proc, GenerateProcName(table, proc))}:
-        <#if proc.inputs?size gt 0>
+        <#if proc.inputs?size gt 0 || proc.dynamics?size gt 0>
         params = process_bind_params(session, [<#list proc.inputs as field>${getSQLAlchemyBaseType(field,GenerateProcName(table, proc))},
                                         </#list><#list proc.dynamics as dynamic>db_types.NonNullableString,</#list>], [<#list proc.inputs as field>${field.name}<#if field.enums?size gt 0>.value if isinstance(${field.name}, <#if field.type?c == '28' || field.type?c == '21'>enum.Enum<#else>enum.IntEnum</#if>) else ${field.name}</#if>,
                                         </#list><#list proc.dynamics as dynamic>${dynamic},</#list>])
         </#if>
-        res = session.execute(cls.get_statement(<#if proc.inputs?size gt 0>*params</#if>))
+        res = session.execute(cls.get_statement(<#if proc.inputs?size gt 0 || proc.dynamics?size gt 0>*params</#if>))
         <#if proc.isSingle()>
         rec = res.fetchone()
         if rec:
