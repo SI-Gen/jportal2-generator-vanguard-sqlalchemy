@@ -2,24 +2,23 @@
 ################## Generated Code. DO NOT CHANGE THIS CODE. Change it in the generator and regenerate ##################
 ########################################################################################################################
 
-from dataclasses import dataclass, field
-from datetime import datetime
-from typing import List, Any, Optional
+from dataclasses import dataclass
 import enum
+from typing import Optional
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import TextAsFrom
 
 from .common.db_common import DBMixin, Base, DBColumn
 from .common import db_types
-from .common.processing import process_result_recs, process_result_rec, process_bind_params
+from .common.processing import process_bind_params, process_result_rec
 
 
 
 TESTENUM_SCHEMA = "todolist_app"
 class DB_TestEnum(Base, DBMixin):
     # Enum for NodeTypeCharEn field
-    class NodeTypeCharEnEnum( enum.Enum):
+    class NodeTypeCharEnEnum(enum.Enum):
         Normal = 'N'
         Error = 'E'
         Completed = 'C'
@@ -37,7 +36,7 @@ class DB_TestEnum(Base, DBMixin):
 
 
     # Enum for IntEn field
-    class IntEnEnum( enum.IntEnum):
+    class IntEnEnum(enum.IntEnum):
         First = 1
         Second = 2
 
@@ -50,21 +49,24 @@ class DB_TestEnum(Base, DBMixin):
             return value.value
 
 
-    ID: int = DBColumn("id", sa.Integer(), primary_key=True, autoincrement=True)
+    ID: int = DBColumn("id", sa.Integer(),
+        primary_key=True,
+        autoincrement=True)
     NodeTypeCharEn: NodeTypeCharEnEnum = DBColumn("nodetypecharen", sa.String(length=1))
     IntEn: IntEnEnum = DBColumn("inten", db_types.IntEnum(IntEnEnum))
 
     __schema__ = TESTENUM_SCHEMA
 
-    def __init__(self, NodeTypeCharEn: NodeTypeCharEnEnum, IntEn: IntEnEnum):
-        super(DB_TestEnum, self).__init__(
-            NodeTypeCharEn=NodeTypeCharEn,
-            IntEn=IntEn)
+    def __init__(self,
+        NodeTypeCharEn: NodeTypeCharEnEnum,
+        IntEn: IntEnEnum):
+        self.NodeTypeCharEn = NodeTypeCharEn
+        self.IntEn = IntEn
 
 @dataclass
 class DB_TestEnumInsertReturning:
     # Enum for NodeTypeCharEn field
-    class NodeTypeCharEnEnum( enum.Enum):
+    class NodeTypeCharEnEnum(enum.Enum):
         Normal = 'N'
         Error = 'E'
         Completed = 'C'
@@ -82,7 +84,7 @@ class DB_TestEnumInsertReturning:
 
 
     # Enum for IntEn field
-    class IntEnEnum( enum.IntEnum):
+    class IntEnEnum(enum.IntEnum):
         First = 1
         Second = 2
 
@@ -110,16 +112,16 @@ class DB_TestEnumInsertReturning:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.TestEnum.Insert */"
-                        f"insert into ToDoList_App.TestEnum ("
-                        f"  NodeTypeCharEn,"
-                        f"  IntEn"
-                        f" ) "
+                        "/* PROC ToDoList_App.TestEnum.Insert */"
+                        "insert into ToDoList_App.TestEnum ("
+                        "  NodeTypeCharEn,"
+                        "  IntEn"
+                        " ) "
                         f"{_ret.output}"
-                        f" values ("
-                        f"  :NodeTypeCharEn,"
-                        f"  :IntEn"
-                        f" )"
+                        " values ("
+                        "  :NodeTypeCharEn,"
+                        "  :IntEn"
+                        " )"
                         f"{_ret.tail}")
 
         text_statement = statement.columns(ID=sa.types.Integer,
@@ -133,17 +135,29 @@ class DB_TestEnumInsertReturning:
     def execute(cls, session: Session, NodeTypeCharEn: NodeTypeCharEnEnum
                      , IntEn: IntEnEnum
                      ) -> Optional['DB_TestEnumInsertReturning']:
-        params = process_bind_params(session, [sa.types.String,
-                                        sa.types.Integer,
-                                        ], [NodeTypeCharEn.value if isinstance(NodeTypeCharEn, enum.Enum) else NodeTypeCharEn,
-                                        IntEn.value if isinstance(IntEn, enum.IntEnum) else IntEn,
-                                        ])
+        params = process_bind_params(
+            session,
+            [
+                sa.types.String,
+                sa.types.Integer,
+            ],
+            [
+                NodeTypeCharEn.value if isinstance(NodeTypeCharEn, enum.Enum) else NodeTypeCharEn,
+                IntEn.value if isinstance(IntEn, enum.IntEnum) else IntEn,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         rec = res.fetchone()
         if rec:
             res.close()
-            return process_result_rec(DB_TestEnumInsertReturning, session, [sa.types.Integer,
-                                        ], rec)
+            return process_result_rec(
+                DB_TestEnumInsertReturning,
+                session,
+                [
+                    sa.types.Integer,
+                ],
+                rec,
+            )
 
         return None
 
@@ -162,7 +176,7 @@ class DB_TestEnumIdentity:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"select max(ID) ID from ToDoList_App.TestEnum")
+                        "select max(ID) ID from ToDoList_App.TestEnum")
 
         text_statement = statement.columns(ID=sa.types.Integer,
                                       )
@@ -174,15 +188,21 @@ class DB_TestEnumIdentity:
         rec = res.fetchone()
         if rec:
             res.close()
-            return process_result_rec(DB_TestEnumIdentity, session, [sa.types.Integer,
-                                        ], rec)
+            return process_result_rec(
+                DB_TestEnumIdentity,
+                session,
+                [
+                    sa.types.Integer,
+                ],
+                rec,
+            )
 
         return None
 
 @dataclass
 class DB_TestEnumUpdate:
     # Enum for NodeTypeCharEn field
-    class NodeTypeCharEnEnum( enum.Enum):
+    class NodeTypeCharEnEnum(enum.Enum):
         Normal = 'N'
         Error = 'E'
         Completed = 'C'
@@ -200,7 +220,7 @@ class DB_TestEnumUpdate:
 
 
     # Enum for IntEn field
-    class IntEnEnum( enum.IntEnum):
+    class IntEnEnum(enum.IntEnum):
         First = 1
         Second = 2
 
@@ -228,11 +248,11 @@ class DB_TestEnumUpdate:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"update ToDoList_App.TestEnum"
-                        f" set"
-                        f"  NodeTypeCharEn = :NodeTypeCharEn"
-                        f", IntEn = :IntEn"
-                        f" where ID = :ID")
+                        "update ToDoList_App.TestEnum"
+                        " set"
+                        "  NodeTypeCharEn = :NodeTypeCharEn"
+                        ", IntEn = :IntEn"
+                        " where ID = :ID")
 
         text_statement = statement.columns()
         text_statement = text_statement.bindparams(NodeTypeCharEn=NodeTypeCharEn,
@@ -246,20 +266,26 @@ class DB_TestEnumUpdate:
                      , IntEn: IntEnEnum
                      , ID: int
                      ) -> None:
-        params = process_bind_params(session, [sa.types.String,
-                                        sa.types.Integer,
-                                        sa.types.Integer,
-                                        ], [NodeTypeCharEn.value if isinstance(NodeTypeCharEn, enum.Enum) else NodeTypeCharEn,
-                                        IntEn.value if isinstance(IntEn, enum.IntEnum) else IntEn,
-                                        ID,
-                                        ])
+        params = process_bind_params(
+            session,
+            [
+                sa.types.String,
+                sa.types.Integer,
+                sa.types.Integer,
+            ],
+            [
+                NodeTypeCharEn.value if isinstance(NodeTypeCharEn, enum.Enum) else NodeTypeCharEn,
+                IntEn.value if isinstance(IntEn, enum.IntEnum) else IntEn,
+                ID,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         res.close()
 
 @dataclass
 class DB_TestEnumSelectOne:
     # Enum for NodeTypeCharEn field
-    class NodeTypeCharEnEnum( enum.Enum):
+    class NodeTypeCharEnEnum(enum.Enum):
         Normal = 'N'
         Error = 'E'
         Completed = 'C'
@@ -277,7 +303,7 @@ class DB_TestEnumSelectOne:
 
 
     # Enum for IntEn field
-    class IntEnEnum( enum.IntEnum):
+    class IntEnEnum(enum.IntEnum):
         First = 1
         Second = 2
 
@@ -289,6 +315,9 @@ class DB_TestEnumSelectOne:
         def process_bind_param_cls(cls, value, dialect):
             return value.value
 
+
+    #Inputs
+    ID: int
 
     #Outputs
     NodeTypeCharEn: NodeTypeCharEnEnum
@@ -305,12 +334,12 @@ class DB_TestEnumSelectOne:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.TestEnum.SelectOne */"
-                        f"select"
-                        f"  NodeTypeCharEn"
-                        f", IntEn"
-                        f" from ToDoList_App.TestEnum"
-                        f" where ID = :ID")
+                        "/* PROC ToDoList_App.TestEnum.SelectOne */"
+                        "select"
+                        "  NodeTypeCharEn"
+                        ", IntEn"
+                        " from ToDoList_App.TestEnum"
+                        " where ID = :ID")
 
         text_statement = statement.columns(NodeTypeCharEn=sa.types.String,
                                       IntEn=sa.types.Integer,
@@ -322,16 +351,29 @@ class DB_TestEnumSelectOne:
     @classmethod
     def execute(cls, session: Session, ID: int
                      ) -> Optional['DB_TestEnumSelectOne']:
-        params = process_bind_params(session, [sa.types.Integer,
-                                        ], [ID,
-                                        ])
+        params = process_bind_params(
+            session,
+            [
+                sa.types.Integer,
+            ],
+            [
+                ID,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         rec = res.fetchone()
         if rec:
             res.close()
-            return process_result_rec(DB_TestEnumSelectOne, session, [DB_TestEnumSelectOne.NodeTypeCharEnEnum,
-                                        DB_TestEnumSelectOne.IntEnEnum,
-                                        ], rec)
+            return process_result_rec(
+                DB_TestEnumSelectOne,
+                session,
+                [
+                    DB_TestEnumSelectOne.NodeTypeCharEnEnum,
+                    DB_TestEnumSelectOne.IntEnEnum,
+                ],
+                rec,
+                ID=ID,
+            )
 
         return None
 
@@ -350,9 +392,9 @@ class DB_TestEnumDeleteOne:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.TestEnum.DeleteOne */"
-                        f"delete from ToDoList_App.TestEnum"
-                        f" where ID = :ID")
+                        "/* PROC ToDoList_App.TestEnum.DeleteOne */"
+                        "delete from ToDoList_App.TestEnum"
+                        " where ID = :ID")
 
         text_statement = statement.columns()
         text_statement = text_statement.bindparams(ID=ID,
@@ -362,9 +404,15 @@ class DB_TestEnumDeleteOne:
     @classmethod
     def execute(cls, session: Session, ID: int
                      ) -> None:
-        params = process_bind_params(session, [sa.types.Integer,
-                                        ], [ID,
-                                        ])
+        params = process_bind_params(
+            session,
+            [
+                sa.types.Integer,
+            ],
+            [
+                ID,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         res.close()
 
@@ -384,9 +432,9 @@ class DB_TestEnumExists:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.TestEnum.Exists */"
-                        f"select count(*) noOf from ToDoList_App.TestEnum"
-                        f" where ID = :ID")
+                        "/* PROC ToDoList_App.TestEnum.Exists */"
+                        "select count(*) noOf from ToDoList_App.TestEnum"
+                        " where ID = :ID")
 
         text_statement = statement.columns(noOf=sa.types.Integer,
                                       )
@@ -397,15 +445,27 @@ class DB_TestEnumExists:
     @classmethod
     def execute(cls, session: Session, ID: int
                      ) -> Optional['DB_TestEnumExists']:
-        params = process_bind_params(session, [sa.types.Integer,
-                                        ], [ID,
-                                        ])
+        params = process_bind_params(
+            session,
+            [
+                sa.types.Integer,
+            ],
+            [
+                ID,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         rec = res.fetchone()
         if rec:
             res.close()
-            return process_result_rec(DB_TestEnumExists, session, [sa.types.Integer,
-                                        ], rec)
+            return process_result_rec(
+                DB_TestEnumExists,
+                session,
+                [
+                    sa.types.Integer,
+                ],
+                rec,
+            )
 
         return None
 
@@ -425,13 +485,13 @@ class DB_TestEnumCheckIfStoredProcCreated:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.TestEnum.CheckIfStoredProcCreated */"
-                        f"SELECT "
-                        f"Payload "
-                        f"FROM "
-                        f"TestSP "
-                        f"WHERE "
-                        f"ID = :ID ")
+                        "/* PROC ToDoList_App.TestEnum.CheckIfStoredProcCreated */"
+                        "SELECT "
+                        "Payload "
+                        "FROM "
+                        "TestSP "
+                        "WHERE "
+                        "ID = :ID ")
 
         text_statement = statement.columns()
         text_statement = text_statement.bindparams(ID=ID,
@@ -443,10 +503,16 @@ class DB_TestEnumCheckIfStoredProcCreated:
     def execute(cls, session: Session, ID: int
                      , Payload: int
                      ) -> None:
-        params = process_bind_params(session, [sa.types.Integer,
-                                        sa.types.Integer,
-                                        ], [ID,
-                                        Payload,
-                                        ])
+        params = process_bind_params(
+            session,
+            [
+                sa.types.Integer,
+                sa.types.Integer,
+            ],
+            [
+                ID,
+                Payload,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         res.close()

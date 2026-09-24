@@ -37,6 +37,18 @@ from .db_TestEnum import DB_TestEnumSelectOne
 from .db_TestEnum import DB_TestEnumDeleteOne
 from .db_TestEnum import DB_TestEnumExists
 from .db_TestEnum import DB_TestEnumCheckIfStoredProcCreated
+from .db_DynamicSQL import DB_DynamicSQL
+from .db_DynamicSQL import DB_DynamicSQLBatchMarkAsSent
+from .db_DynamicSQL import DB_DynamicSQLMarkSelected
+from .db_DynamicSQL import DB_DynamicSQLMarkAll
+from .db_DynamicSQL import DB_DynamicSQLMarkOne
+from .db_ETRThreshold import DB_ETRThreshold
+from .db_ETRThreshold import DB_ETRThresholdInsert
+from .db_ETRThreshold import DB_ETRThresholdSelectOne
+from .db_ETRThreshold import DB_ETRThresholdUpdate
+from .db_CompositeKeyItem import DB_CompositeKeyItem
+from .db_CompositeKeyItem import DB_CompositeKeyItemInsert
+from .db_CompositeKeyItem import DB_CompositeKeyItemSelectOne
 from .db_ToDo_Item import DB_ToDo_Item
 from .db_ToDo_Item import DB_ToDo_ItemInsert
 from .db_ToDo_Item import DB_ToDo_ItemIdentity
@@ -47,6 +59,9 @@ from .db_ToDo_Item import DB_ToDo_ItemSelectByTodoList_ID
 from .db_ToDo_Item import DB_ToDo_ItemUpdateByItemDescription
 
 ALL_TABLES = [
+    DB_CompositeKeyItem,
+    DB_DynamicSQL,
+    DB_ETRThreshold,
     DB_TestEnum,
     DB_TestJSON,
     DB_TestSP,
@@ -56,6 +71,18 @@ ALL_TABLES = [
 
 
 ALL_PROCS = [
+    DB_CompositeKeyItemInsert,
+    DB_CompositeKeyItemSelectOne,
+
+    DB_DynamicSQLBatchMarkAsSent,
+    DB_DynamicSQLMarkAll,
+    DB_DynamicSQLMarkOne,
+    DB_DynamicSQLMarkSelected,
+
+    DB_ETRThresholdInsert,
+    DB_ETRThresholdSelectOne,
+    DB_ETRThresholdUpdate,
+
     DB_TestEnumCheckIfStoredProcCreated,
     DB_TestEnumDeleteOne,
     DB_TestEnumExists,
@@ -104,11 +131,26 @@ ALL_PROCS = [
 
 
 __all__ = [
+    "DB_CompositeKeyItem",
+    "DB_DynamicSQL",
+    "DB_ETRThreshold",
     "DB_TestEnum",
     "DB_TestJSON",
     "DB_TestSP",
     "DB_ToDo_Item",
     "DB_ToDoList",
+
+    "DB_CompositeKeyItemInsert",
+    "DB_CompositeKeyItemSelectOne",
+
+    "DB_DynamicSQLBatchMarkAsSent",
+    "DB_DynamicSQLMarkAll",
+    "DB_DynamicSQLMarkOne",
+    "DB_DynamicSQLMarkSelected",
+
+    "DB_ETRThresholdInsert",
+    "DB_ETRThresholdSelectOne",
+    "DB_ETRThresholdUpdate",
 
     "DB_TestEnumCheckIfStoredProcCreated",
     "DB_TestEnumDeleteOne",

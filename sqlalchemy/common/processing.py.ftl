@@ -12,7 +12,7 @@ def process_bind_params(session, types, params):
     return processed_params
 
 
-def process_result_rec(cls, session, types, rec):
+def process_result_rec(cls, session, types, rec, **inputs_not_in_outputs):
     processed_rec = []
     dialect = session.bind.dialect
 
@@ -23,6 +23,10 @@ def process_result_rec(cls, session, types, rec):
         else:
             processed_rec.append(rec[i])
 
+    # SelectOne declares lookup inputs before output columns, then passes those
+    # inputs as keywords because they are not part of the result row.
+    if inputs_not_in_outputs:
+        return cls(*inputs_not_in_outputs.values(), *processed_rec)
     return cls(*processed_rec)
 
 

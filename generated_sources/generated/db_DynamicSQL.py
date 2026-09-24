@@ -2,33 +2,39 @@
 ################## Generated Code. DO NOT CHANGE THIS CODE. Change it in the generator and regenerate ##################
 ########################################################################################################################
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Any, Optional
-
+from typing import Optional
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import TextAsFrom
 
 from .common.db_common import DBMixin, Base, DBColumn
 from .common import db_types
-from .common.processing import process_result_recs, process_result_rec, process_bind_params
+from .common.processing import process_bind_params
 
 
 
 DYNAMICSQL_SCHEMA = "todolist_app"
 class DB_DynamicSQL(Base, DBMixin):
-    Id: int = DBColumn("id", sa.Integer(), primary_key=True, autoincrement=False)
+    Id: int = DBColumn("id", sa.Integer(),
+        primary_key=True,
+        autoincrement=False)
     Sent: int = DBColumn("sent", sa.SmallInteger())
-    SendDateTime: Optional[datetime] = DBColumn("senddatetime", sa.DateTime(), nullable=True, default=datetime.now, onupdate=datetime.now)
+    SendDateTime: Optional[datetime] = DBColumn("senddatetime", sa.DateTime(),
+        nullable=True,
+        default=datetime.now,
+        onupdate=datetime.now)
 
     __schema__ = DYNAMICSQL_SCHEMA
 
-    def __init__(self, Id: Optional[int], Sent: int, SendDateTime: Optional[datetime]):
-        super(DB_DynamicSQL, self).__init__(
-            Id=Id,
-            Sent=Sent,
-            SendDateTime=SendDateTime)
+    def __init__(self,
+        Id: int,
+        Sent: int,
+        SendDateTime: Optional[datetime]):
+        self.Id = Id
+        self.Sent = Sent
+        self.SendDateTime = SendDateTime
 
 @dataclass
 class DB_DynamicSQLBatchMarkAsSent:
@@ -44,20 +50,28 @@ class DB_DynamicSQLBatchMarkAsSent:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.DynamicSQL.BatchMarkAsSent */"
-                        f"UPDATE DynamicSQL "
-                        f"SET Sent = 1, "
-                        f"SendDateTime = CURRENT_TIMESTAMP "
-                        f"WHERE Id IN (  "
+                        "/* PROC ToDoList_App.DynamicSQL.BatchMarkAsSent */"
+                        "UPDATE DynamicSQL "
+                        "SET Sent = 1, "
+                        "SendDateTime = CURRENT_TIMESTAMP "
+                        "WHERE Id IN (  "
                         f"{SentIds}"
-                        f" ) ")
+                        " ) ")
 
         text_statement = statement.columns()
         return text_statement
 
     @classmethod
     def execute(cls, session: Session, SentIds: str) -> None:
-        params = process_bind_params(session, [db_types.NonNullableString,], [SentIds,])
+        params = process_bind_params(
+            session,
+            [
+                db_types.NonNullableString,
+            ],
+            [
+                SentIds,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         res.close()
 
@@ -76,12 +90,12 @@ class DB_DynamicSQLMarkSelected:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.DynamicSQL.MarkSelected */"
-                        f"UPDATE DynamicSQL "
-                        f"SET Sent = :Sent "
-                        f"WHERE Id IN (  "
+                        "/* PROC ToDoList_App.DynamicSQL.MarkSelected */"
+                        "UPDATE DynamicSQL "
+                        "SET Sent = :Sent "
+                        "WHERE Id IN (  "
                         f"{SentIds}"
-                        f" ) ")
+                        " ) ")
 
         text_statement = statement.columns()
         text_statement = text_statement.bindparams(Sent=Sent,
@@ -91,9 +105,17 @@ class DB_DynamicSQLMarkSelected:
     @classmethod
     def execute(cls, session: Session, Sent: int
                      , SentIds: str) -> None:
-        params = process_bind_params(session, [sa.types.SmallInteger,
-                                        db_types.NonNullableString,], [Sent,
-                                        SentIds,])
+        params = process_bind_params(
+            session,
+            [
+                sa.types.SmallInteger,
+                db_types.NonNullableString,
+            ],
+            [
+                Sent,
+                SentIds,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         res.close()
 
@@ -111,8 +133,8 @@ class DB_DynamicSQLMarkAll:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.DynamicSQL.MarkAll */"
-                        f"UPDATE DynamicSQL SET Sent = 1 ")
+                        "/* PROC ToDoList_App.DynamicSQL.MarkAll */"
+                        "UPDATE DynamicSQL SET Sent = 1 ")
 
         text_statement = statement.columns()
         return text_statement
@@ -137,8 +159,8 @@ class DB_DynamicSQLMarkOne:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.DynamicSQL.MarkOne */"
-                        f"UPDATE DynamicSQL SET Sent = 1 WHERE Id = :Id ")
+                        "/* PROC ToDoList_App.DynamicSQL.MarkOne */"
+                        "UPDATE DynamicSQL SET Sent = 1 WHERE Id = :Id ")
 
         text_statement = statement.columns()
         text_statement = text_statement.bindparams(Id=Id,
@@ -148,8 +170,14 @@ class DB_DynamicSQLMarkOne:
     @classmethod
     def execute(cls, session: Session, Id: int
                      ) -> None:
-        params = process_bind_params(session, [sa.types.Integer,
-                                        ], [Id,
-                                        ])
+        params = process_bind_params(
+            session,
+            [
+                sa.types.Integer,
+            ],
+            [
+                Id,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         res.close()

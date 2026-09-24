@@ -21,6 +21,7 @@ def test_jsonInsertReturningSimple(postgres14p2_db):
     session = Session(postgres14p2_db)
     rec = DB_TestJSONInsertReturning.execute(session,
                                              json.dumps(simple_dict))
+    assert rec is not None
     session.commit()
 
     res = postgres14p2_db.execute("SELECT ID, payload "

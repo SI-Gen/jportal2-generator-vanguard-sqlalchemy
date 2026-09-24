@@ -1,0 +1,22 @@
+DATABASE ExampleDatabase
+PACKAGE com.example.db
+SERVER ExampleServer
+SCHEMA ToDoList_App
+
+TABLE ETRThreshold
+  ID                  SEQUENCE
+  YOA                 INT
+  StartAmount         FLOAT(15,2)
+  EndAmount           FLOAT(15,2) NULL
+  TaxBaseAmount       FLOAT(15,2) NULL
+  Percentage          FLOAT(15,2) NULL
+  Threshold           FLOAT(15,2) NULL
+  UsrID               CHAR(16)
+  TMStamp             TIMESTAMP
+
+KEY PKEY PRIMARY
+    ID
+
+PROC Insert
+PROC SelectOne
+PROC Update

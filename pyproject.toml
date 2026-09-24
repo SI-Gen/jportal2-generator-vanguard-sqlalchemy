@@ -24,3 +24,29 @@ pythonpath = [".", "generated_sources"]
 extraPaths = ["generated_sources"]
 venvPath = "."
 venv = ".venv"
+
+[tool.ruff]
+exclude = [
+    "tests",
+]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E", # pycodestyle errors
+    "F", # Pyflakes
+    "PL", # Pylint
+]
+
+[tool.ruff.lint.pylint]
+max-positional-args = 10
+max-args = 10
+
+[tool.mypy]
+disallow_untyped_defs = true
+strict = true
+follow_untyped_imports = true
+exclude = [
+    "tests/",
+    "generated_sources/",
+]

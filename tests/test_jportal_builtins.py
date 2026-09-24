@@ -6,15 +6,16 @@ def todolist_single_test_record():
     import datetime
     from generated import DB_ToDoList
 
-    return DB_ToDoList(ListName="LIST", ListType=DB_ToDoList.ListTypeEnum.Private, Description="Desc", LastUpdated=datetime.date(2020, 1, 1))
+    return DB_ToDoList(ListName="LIST", ListType=DB_ToDoList.ListTypeEnum.Private, Description="Desc", LastUpdated=datetime.datetime(2020, 1, 1))
     #return DB_ToDoList(ListName="LIST", ListType=1, Description="Desc", LastUpdated=datetime.date(2020, 1, 1))
 
 
 @pytest.fixture
 def todoitem_single_test_record():
     import datetime
+    from typing import cast
     from generated import DB_ToDo_Item
-    return DB_ToDo_Item(TodoList_ID=None,
+    return DB_ToDo_Item(TodoList_ID=cast(int, None),
                         ItemName="Item 1",
                         ItemDescription="Description",
                         LastUpdated=datetime.datetime.now())
@@ -31,6 +32,7 @@ def test_JPortalInsertReturning(postgres14p2_db):
                                              DB_ToDoListInsertReturning.ListTypeEnum.Private,
                                              "Jportal Insert List Description",
                                              datetime.datetime.now())
+    assert rec is not None
     session.commit()
 
     res = postgres14p2_db.execute("SELECT ID, ListName,ListType,Description,LastUpdated "
@@ -81,6 +83,7 @@ def test_JPortalSelectOne(postgres14p2_db, todolist_single_test_record):
     session.commit()
 
     rec = DB_ToDoListSelectOne.execute(session, todolist_single_test_record.ID)
+    assert rec is not None
 
     assert (rec.ListName == "LIST")
     assert (rec.ListType == DB_ToDoListSelectOne.ListTypeEnum.Private)
@@ -98,9 +101,11 @@ def test_JPortalExists(postgres14p2_db, todolist_single_test_record):
     session.commit()
 
     rec = DB_ToDoListExists.execute(session, todolist_single_test_record.ID)
+    assert rec is not None
     assert (rec.noOf == 1)
 
     rec = DB_ToDoListExists.execute(session, -500)
+    assert rec is not None
     assert (rec.noOf == 0)
 
 
@@ -146,6 +151,7 @@ def test_JPortalUpdate(postgres14p2_db, todolist_single_test_record,
 
     # TODO: Check with normal alchmemy select instead
     rec = DB_ToDo_ItemSelectOne.execute(session, todoitem_single_test_record.ID)
+    assert rec is not None
 
     assert (rec.ItemName == "UPDATED")
     assert (rec.TodoList_ID == todoitem_single_test_record.TodoList_ID)

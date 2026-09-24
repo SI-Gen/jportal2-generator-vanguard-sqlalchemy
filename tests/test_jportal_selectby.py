@@ -4,15 +4,16 @@ from generated import DB_ToDoList
 @pytest.fixture
 def todolist_single_test_record():
     import datetime
-    # return DB_ToDoList(ListName="LIST", ListType=1, Description="Desc", LastUpdated=datetime.date(2020, 1, 1))
-    return DB_ToDoList(ListName="LIST", ListType=DB_ToDoList.ListTypeEnum.Private, Description="Desc", LastUpdated=datetime.date(2020, 1, 1))
+    # return DB_ToDoList(ListName="LIST", ListType=1, Description="Desc", LastUpdated=datetime.datetime(2020, 1, 1))
+    return DB_ToDoList(ListName="LIST", ListType=DB_ToDoList.ListTypeEnum.Private, Description="Desc", LastUpdated=datetime.datetime(2020, 1, 1))
 
 
 @pytest.fixture
 def todoitem_single_test_record():
     import datetime
+    from typing import cast
     from generated import DB_ToDo_Item
-    return DB_ToDo_Item(TodoList_ID=None,
+    return DB_ToDo_Item(TodoList_ID=cast(int, None),
                         ItemName="Item 1",
                         ItemDescription="Description",
                         LastUpdated=datetime.datetime.now())
@@ -29,6 +30,7 @@ def test_JPortalSelectOneBySimpleStandard(postgres14p2_db, todolist_single_test_
     session.commit()
 
     rec = DB_ToDoListSelectOneByListName.execute(session, todolist_single_test_record.ListName)
+    assert rec is not None
 
     assert (rec.ListName == "LIST")
     assert (rec.ListType == DB_ToDoListSelectOneByListName.ListTypeEnum.Private)
@@ -42,15 +44,15 @@ def test_JPortalSelectByReturningList(postgres14p2_db):
     import datetime
 
     session = Session(postgres14p2_db)
-    rec1 = DB_ToDoList(ListName="LIST 1", ListType=DB_ToDoList.ListTypeEnum.Public, Description="Desc 1", LastUpdated=datetime.date(2020, 1, 1))
-    rec2 = DB_ToDoList(ListName="LIST 2", ListType=DB_ToDoList.ListTypeEnum.Public, Description="Desc 2", LastUpdated=datetime.date(2020, 1, 1))
+    rec1 = DB_ToDoList(ListName="LIST 1", ListType=DB_ToDoList.ListTypeEnum.Public, Description="Desc 1", LastUpdated=datetime.datetime(2020, 1, 1))
+    rec2 = DB_ToDoList(ListName="LIST 2", ListType=DB_ToDoList.ListTypeEnum.Public, Description="Desc 2", LastUpdated=datetime.datetime(2020, 1, 1))
 
     session.add(rec1)
     session.add(rec2)
 
     session.commit()
 
-    rec = DB_ToDoListSelectByListType.execute(session, DB_ToDoList.ListTypeEnum.Public)
+    rec = DB_ToDoListSelectByListType.execute(session, DB_ToDoListSelectByListType.ListTypeEnum.Public)
     assert( len(rec) == 2)
 
     assert (rec[0].ListName == "LIST 1")
@@ -63,15 +65,15 @@ def test_JPortalSelectByReturningCustomFields(postgres14p2_db):
     import datetime
 
     session = Session(postgres14p2_db)
-    rec1 = DB_ToDoList(ListName="LIST 1", ListType=DB_ToDoList.ListTypeEnum.Custom, Description="Desc 1", LastUpdated=datetime.date(2020, 1, 1))
-    rec2 = DB_ToDoList(ListName="LIST 2", ListType=DB_ToDoList.ListTypeEnum.Custom, Description="Desc 2", LastUpdated=datetime.date(2020, 1, 1))
+    rec1 = DB_ToDoList(ListName="LIST 1", ListType=DB_ToDoList.ListTypeEnum.Custom, Description="Desc 1", LastUpdated=datetime.datetime(2020, 1, 1))
+    rec2 = DB_ToDoList(ListName="LIST 2", ListType=DB_ToDoList.ListTypeEnum.Custom, Description="Desc 2", LastUpdated=datetime.datetime(2020, 1, 1))
 
     session.add(rec1)
     session.add(rec2)
 
     session.commit()
 
-    rec = DB_ToDoListSelectIDByListType.execute(session, DB_ToDoList.ListTypeEnum.Custom)
+    rec = DB_ToDoListSelectIDByListType.execute(session, DB_ToDoListSelectIDByListType.ListTypeEnum.Custom)
     assert( len(rec) == 2)
     assert (rec[0].ID == rec1.ID)
     assert (rec[1].ID == rec2.ID)

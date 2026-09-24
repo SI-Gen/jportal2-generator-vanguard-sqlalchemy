@@ -1,0 +1,17 @@
+DATABASE ExampleDatabase
+PACKAGE com.example.db
+SERVER ExampleServer
+SCHEMA ToDoList_App
+
+TABLE CompositeKeyItem
+  YearNo      INT
+  ItemCode    CHAR(8)
+  Amount      INT
+  Note        CHAR(32) NULL
+
+KEY PKEY PRIMARY
+  YearNo
+  ItemCode
+
+PROC Insert
+PROC SelectOne
