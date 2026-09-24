@@ -11,7 +11,7 @@ endif
 generate-jportal: # Generate SQLAlchemy sources from the SI files.
 	bash generate_jportal.sh
 
-test: # Run the tests in the tests folder.
+test: generate-jportal # Run the tests in the tests folder.
 	.venv/bin/python -m pytest tests
 
 # https://dwmkerr.com/makefile-help-command/
