@@ -1,6 +1,6 @@
 [project]
 name = "jportal2-generator-vanguardg-sqlalchemy"
-version = "0.0.0"
+version = "2.8"
 description = "JPortal2 generator that generates SQLAlchemy-based database access for the Vanguard framework"
 readme = "README.md"
 requires-python = ">=3.9,<3.10"

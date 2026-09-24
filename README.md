@@ -14,8 +14,8 @@ Usage:
 #Change directory to template directory
 cd <template_directory>
 
-#Download version $VERSION template
-SQLALCHEMY_TEMPLATE_VERSION=2.6
+#Download version $VERSION template. This matches the git tag and pyproject.toml version.
+SQLALCHEMY_TEMPLATE_VERSION=2.8
 
 #Run JPortal2
 java -jar jportal.jar \

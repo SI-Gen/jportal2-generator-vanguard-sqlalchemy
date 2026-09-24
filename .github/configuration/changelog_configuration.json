@@ -1,0 +1,12 @@
+{
+  "categories": [
+    {
+      "title": "## Changes",
+      "labels": [],
+      "exhaustive": true
+    }
+  ],
+  "template": "#{{CHANGELOG}}",
+  "commit_template": "- #{{TITLE}}",
+  "empty_template": "- No changes"
+}
