@@ -1,0 +1,114 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "**"
+  pull_request: { }
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv and set the Python version
+        uses: astral-sh/setup-uv@v8.1.0
+        with:
+          python-version: "3.9"
+
+      - name: install deps
+        run: uv sync --frozen
+
+      - name: test
+        run: make test
+
+  # https://github.com/marketplace/actions/alls-green#why
+  check:
+    if: always()
+    needs:
+      - test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
+
+  tag_and_bump:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '#none')
+    outputs:
+      bumped_tag: ${{ steps.publish.outputs.bumped_tag }}
+    needs: check
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: "0"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.1.0
+        with:
+          python-version: "3.9"
+
+      - name: Bump version
+        id: bump_version
+        uses: anothrNick/github-tag-action@1.75.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_BRANCHES: main
+          DEFAULT_BUMP: patch
+          # Existing tags are 2.8, which is not major.minor.patch, so the
+          # action ignores them. 2.8.0 is that release in semver form.
+          INITIAL_VERSION: 2.8.0
+          DRY_RUN: true
+
+      - name: Build Changelog
+        id: changelog_builder
+        uses: mikepenz/release-changelog-builder-action@v6
+        with:
+          configuration: "./.github/configuration/changelog_configuration.json"
+          mode: "COMMIT"
+
+      - name: Update version files, tag, and push
+        id: publish
+        run: |
+          version="${{ steps.bump_version.outputs.new_tag }}"
+          if [ -z "$version" ]; then
+            echo "No version calculated"
+            echo "bumped=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if git rev-parse -q --verify "refs/tags/${version}" >/dev/null \
+            && [ "$(git rev-parse HEAD)" = "$(git rev-parse "refs/tags/${version}^{}")" ]; then
+            echo "HEAD is already ${version}"
+            echo "bumped=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          uv version "$version"
+          sed -i "s/^SQLALCHEMY_TEMPLATE_VERSION=.*/SQLALCHEMY_TEMPLATE_VERSION=${version}/" README.md
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pyproject.toml uv.lock README.md
+          git commit -m "chore: bump version to ${version} #none"
+          git tag "$version"
+          git push origin HEAD:main
+          git push origin "refs/tags/${version}"
+          echo "bumped=true" >> "$GITHUB_OUTPUT"
+          echo "bumped_tag=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Release
+        if: steps.publish.outputs.bumped == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ steps.publish.outputs.bumped_tag }}
+          body: ${{ steps.changelog_builder.outputs.changelog }}
+          draft: false

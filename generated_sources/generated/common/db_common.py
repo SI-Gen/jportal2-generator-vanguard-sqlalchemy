@@ -1,23 +1,29 @@
 from functools import partial
+from typing import TYPE_CHECKING, Any
+
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 
-Base = declarative_base()
+if TYPE_CHECKING:
+    class Base:
+        metadata: sa.MetaData
+else:
+    Base = declarative_base()
 
 DBColumn = partial(sa.Column, nullable=False)
 
 
 class DBMixin:
     @declared_attr
-    def __tablename__(cls):
-        name = cls.__name__.lower()
+    def __tablename__(cls: Any) -> str:
+        name = str(getattr(cls, "__name__")).lower()
         if name.startswith("db_"):
             name = name[3:]
         return name
 
     @declared_attr
-    def __table_args__(cls):
-        return {"schema": cls.__schema__}
+    def __table_args__(cls: Any) -> dict:
+        return {"schema": getattr(cls, "__schema__")}
 
     __indexes__: list = []  # Not used by SQLAlchemy!
     __constraints__: list = []  # Not used by SQLAlchemy!
@@ -28,7 +34,7 @@ class DBMixin:
     def map_from_rec(cls, existing_rec):
         kwargs = {}
         primary_keys = []
-        for col_name, col in cls._sa_class_manager.local_attrs.items():
+        for col_name, col in getattr(cls, "_sa_class_manager").local_attrs.items():
             if col.prop.columns[0].primary_key:
                 primary_keys.append(col_name)
             elif hasattr(existing_rec, col_name) and col.prop.columns[0].onupdate is None:
@@ -43,7 +49,7 @@ class DBMixin:
     def update_from_existing(cls, existing_rec):
         where_clause = []
         kwargs = {}
-        for col_name, col in cls._sa_class_manager.local_attrs.items():
+        for col_name, col in getattr(cls, "_sa_class_manager").local_attrs.items():
             if col.prop.columns[0].primary_key:
                 where_clause.append(col == getattr(existing_rec, col_name))  # the == calls __eq__ on col.
             elif hasattr(existing_rec, col_name) and col.prop.columns[0].onupdate is None:

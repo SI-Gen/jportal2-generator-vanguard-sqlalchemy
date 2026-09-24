@@ -2,24 +2,24 @@
 ################## Generated Code. DO NOT CHANGE THIS CODE. Change it in the generator and regenerate ##################
 ########################################################################################################################
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Any, Optional
 import enum
+from typing import List, Optional
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.expression import TextAsFrom
 
 from .common.db_common import DBMixin, Base, DBColumn
 from .common import db_types
-from .common.processing import process_result_recs, process_result_rec, process_bind_params
+from .common.processing import process_bind_params, process_result_rec, process_result_recs
 
 
 
 TODOLIST_SCHEMA = "todolist_app"
 class DB_ToDoList(Base, DBMixin):
     # Enum for ListType field
-    class ListTypeEnum( enum.IntEnum):
+    class ListTypeEnum(enum.IntEnum):
         Private = 1
         Public = 2
         Custom = 3
@@ -33,25 +33,32 @@ class DB_ToDoList(Base, DBMixin):
             return value.value
 
 
-    ID: int = DBColumn("id", sa.Integer(), primary_key=True, autoincrement=True)
+    ID: int = DBColumn("id", sa.Integer(),
+        primary_key=True,
+        autoincrement=True)
     ListName: str = DBColumn("listname", db_types.NonNullableString(length=255))
     ListType: ListTypeEnum = DBColumn("listtype", db_types.IntEnum(ListTypeEnum))
     Description: str = DBColumn("description", db_types.NonNullableString(length=255))
-    LastUpdated: datetime = DBColumn("lastupdated", sa.DateTime(), default=datetime.now, onupdate=datetime.now)
+    LastUpdated: datetime = DBColumn("lastupdated", sa.DateTime(),
+        default=datetime.now,
+        onupdate=datetime.now)
 
     __schema__ = TODOLIST_SCHEMA
 
-    def __init__(self, ListName: str, ListType: ListTypeEnum, Description: str, LastUpdated: datetime):
-        super(DB_ToDoList, self).__init__(
-            ListName=ListName,
-            ListType=ListType,
-            Description=Description,
-            LastUpdated=LastUpdated)
+    def __init__(self,
+        ListName: str,
+        ListType: ListTypeEnum,
+        Description: str,
+        LastUpdated: datetime):
+        self.ListName = ListName
+        self.ListType = ListType
+        self.Description = Description
+        self.LastUpdated = LastUpdated
 
 @dataclass
 class DB_ToDoListInsertReturning:
     # Enum for ListType field
-    class ListTypeEnum( enum.IntEnum):
+    class ListTypeEnum(enum.IntEnum):
         Private = 1
         Public = 2
         Custom = 3
@@ -82,20 +89,20 @@ class DB_ToDoListInsertReturning:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.ToDoList.Insert */"
-                        f"insert into ToDoList_App.ToDoList ("
-                        f"  ListName,"
-                        f"  ListType,"
-                        f"  Description,"
-                        f"  LastUpdated"
-                        f" ) "
+                        "/* PROC ToDoList_App.ToDoList.Insert */"
+                        "insert into ToDoList_App.ToDoList ("
+                        "  ListName,"
+                        "  ListType,"
+                        "  Description,"
+                        "  LastUpdated"
+                        " ) "
                         f"{_ret.output}"
-                        f" values ("
-                        f"  :ListName,"
-                        f"  :ListType,"
-                        f"  :Description,"
-                        f"  :LastUpdated"
-                        f" )"
+                        " values ("
+                        "  :ListName,"
+                        "  :ListType,"
+                        "  :Description,"
+                        "  :LastUpdated"
+                        " )"
                         f"{_ret.tail}")
 
         text_statement = statement.columns(ID=sa.types.Integer,
@@ -113,21 +120,33 @@ class DB_ToDoListInsertReturning:
                      , Description: str
                      , LastUpdated: datetime
                      ) -> Optional['DB_ToDoListInsertReturning']:
-        params = process_bind_params(session, [db_types.NonNullableString,
-                                        sa.types.SmallInteger,
-                                        db_types.NonNullableString,
-                                        sa.types.DateTime,
-                                        ], [ListName,
-                                        ListType.value if isinstance(ListType, enum.IntEnum) else ListType,
-                                        Description,
-                                        LastUpdated,
-                                        ])
+        params = process_bind_params(
+            session,
+            [
+                db_types.NonNullableString,
+                sa.types.SmallInteger,
+                db_types.NonNullableString,
+                sa.types.DateTime,
+            ],
+            [
+                ListName,
+                ListType.value if isinstance(ListType, enum.IntEnum) else ListType,
+                Description,
+                LastUpdated,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         rec = res.fetchone()
         if rec:
             res.close()
-            return process_result_rec(DB_ToDoListInsertReturning, session, [sa.types.Integer,
-                                        ], rec)
+            return process_result_rec(
+                DB_ToDoListInsertReturning,
+                session,
+                [
+                    sa.types.Integer,
+                ],
+                rec,
+            )
 
         return None
 
@@ -146,7 +165,7 @@ class DB_ToDoListIdentity:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"select max(ID) ID from ToDoList_App.ToDoList")
+                        "select max(ID) ID from ToDoList_App.ToDoList")
 
         text_statement = statement.columns(ID=sa.types.Integer,
                                       )
@@ -158,15 +177,21 @@ class DB_ToDoListIdentity:
         rec = res.fetchone()
         if rec:
             res.close()
-            return process_result_rec(DB_ToDoListIdentity, session, [sa.types.Integer,
-                                        ], rec)
+            return process_result_rec(
+                DB_ToDoListIdentity,
+                session,
+                [
+                    sa.types.Integer,
+                ],
+                rec,
+            )
 
         return None
 
 @dataclass
 class DB_ToDoListUpdate:
     # Enum for ListType field
-    class ListTypeEnum( enum.IntEnum):
+    class ListTypeEnum(enum.IntEnum):
         Private = 1
         Public = 2
         Custom = 3
@@ -197,13 +222,13 @@ class DB_ToDoListUpdate:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"update ToDoList_App.ToDoList"
-                        f" set"
-                        f"  ListName = :ListName"
-                        f", ListType = :ListType"
-                        f", Description = :Description"
-                        f", LastUpdated = :LastUpdated"
-                        f" where ID = :ID")
+                        "update ToDoList_App.ToDoList"
+                        " set"
+                        "  ListName = :ListName"
+                        ", ListType = :ListType"
+                        ", Description = :Description"
+                        ", LastUpdated = :LastUpdated"
+                        " where ID = :ID")
 
         text_statement = statement.columns()
         text_statement = text_statement.bindparams(ListName=ListName,
@@ -221,24 +246,30 @@ class DB_ToDoListUpdate:
                      , LastUpdated: datetime
                      , ID: int
                      ) -> None:
-        params = process_bind_params(session, [db_types.NonNullableString,
-                                        sa.types.SmallInteger,
-                                        db_types.NonNullableString,
-                                        sa.types.DateTime,
-                                        sa.types.Integer,
-                                        ], [ListName,
-                                        ListType.value if isinstance(ListType, enum.IntEnum) else ListType,
-                                        Description,
-                                        LastUpdated,
-                                        ID,
-                                        ])
+        params = process_bind_params(
+            session,
+            [
+                db_types.NonNullableString,
+                sa.types.SmallInteger,
+                db_types.NonNullableString,
+                sa.types.DateTime,
+                sa.types.Integer,
+            ],
+            [
+                ListName,
+                ListType.value if isinstance(ListType, enum.IntEnum) else ListType,
+                Description,
+                LastUpdated,
+                ID,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         res.close()
 
 @dataclass
 class DB_ToDoListSelectOne:
     # Enum for ListType field
-    class ListTypeEnum( enum.IntEnum):
+    class ListTypeEnum(enum.IntEnum):
         Private = 1
         Public = 2
         Custom = 3
@@ -251,6 +282,9 @@ class DB_ToDoListSelectOne:
         def process_bind_param_cls(cls, value, dialect):
             return value.value
 
+
+    #Inputs
+    ID: int
 
     #Outputs
     ListName: str
@@ -269,14 +303,14 @@ class DB_ToDoListSelectOne:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.ToDoList.SelectOne */"
-                        f"select"
-                        f"  ListName"
-                        f", ListType"
-                        f", Description"
-                        f", LastUpdated"
-                        f" from ToDoList_App.ToDoList"
-                        f" where ID = :ID")
+                        "/* PROC ToDoList_App.ToDoList.SelectOne */"
+                        "select"
+                        "  ListName"
+                        ", ListType"
+                        ", Description"
+                        ", LastUpdated"
+                        " from ToDoList_App.ToDoList"
+                        " where ID = :ID")
 
         text_statement = statement.columns(ListName=db_types.NonNullableString,
                                       ListType=sa.types.SmallInteger,
@@ -290,18 +324,31 @@ class DB_ToDoListSelectOne:
     @classmethod
     def execute(cls, session: Session, ID: int
                      ) -> Optional['DB_ToDoListSelectOne']:
-        params = process_bind_params(session, [sa.types.Integer,
-                                        ], [ID,
-                                        ])
+        params = process_bind_params(
+            session,
+            [
+                sa.types.Integer,
+            ],
+            [
+                ID,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         rec = res.fetchone()
         if rec:
             res.close()
-            return process_result_rec(DB_ToDoListSelectOne, session, [db_types.NonNullableString,
-                                        DB_ToDoListSelectOne.ListTypeEnum,
-                                        db_types.NonNullableString,
-                                        sa.types.DateTime,
-                                        ], rec)
+            return process_result_rec(
+                DB_ToDoListSelectOne,
+                session,
+                [
+                    db_types.NonNullableString,
+                    DB_ToDoListSelectOne.ListTypeEnum,
+                    db_types.NonNullableString,
+                    sa.types.DateTime,
+                ],
+                rec,
+                ID=ID,
+            )
 
         return None
 
@@ -320,9 +367,9 @@ class DB_ToDoListDeleteOne:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.ToDoList.DeleteOne */"
-                        f"delete from ToDoList_App.ToDoList"
-                        f" where ID = :ID")
+                        "/* PROC ToDoList_App.ToDoList.DeleteOne */"
+                        "delete from ToDoList_App.ToDoList"
+                        " where ID = :ID")
 
         text_statement = statement.columns()
         text_statement = text_statement.bindparams(ID=ID,
@@ -332,9 +379,15 @@ class DB_ToDoListDeleteOne:
     @classmethod
     def execute(cls, session: Session, ID: int
                      ) -> None:
-        params = process_bind_params(session, [sa.types.Integer,
-                                        ], [ID,
-                                        ])
+        params = process_bind_params(
+            session,
+            [
+                sa.types.Integer,
+            ],
+            [
+                ID,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         res.close()
 
@@ -354,9 +407,9 @@ class DB_ToDoListExists:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.ToDoList.Exists */"
-                        f"select count(*) noOf from ToDoList_App.ToDoList"
-                        f" where ID = :ID")
+                        "/* PROC ToDoList_App.ToDoList.Exists */"
+                        "select count(*) noOf from ToDoList_App.ToDoList"
+                        " where ID = :ID")
 
         text_statement = statement.columns(noOf=sa.types.Integer,
                                       )
@@ -367,22 +420,34 @@ class DB_ToDoListExists:
     @classmethod
     def execute(cls, session: Session, ID: int
                      ) -> Optional['DB_ToDoListExists']:
-        params = process_bind_params(session, [sa.types.Integer,
-                                        ], [ID,
-                                        ])
+        params = process_bind_params(
+            session,
+            [
+                sa.types.Integer,
+            ],
+            [
+                ID,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         rec = res.fetchone()
         if rec:
             res.close()
-            return process_result_rec(DB_ToDoListExists, session, [sa.types.Integer,
-                                        ], rec)
+            return process_result_rec(
+                DB_ToDoListExists,
+                session,
+                [
+                    sa.types.Integer,
+                ],
+                rec,
+            )
 
         return None
 
 @dataclass
 class DB_ToDoListSelectOneByListName:
     # Enum for ListType field
-    class ListTypeEnum( enum.IntEnum):
+    class ListTypeEnum(enum.IntEnum):
         Private = 1
         Public = 2
         Custom = 3
@@ -414,15 +479,15 @@ class DB_ToDoListSelectOneByListName:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.ToDoList.SelectOneByListName */"
-                        f"select"
-                        f"  ID"
-                        f", ListName"
-                        f", ListType"
-                        f", Description"
-                        f", LastUpdated"
-                        f" from ToDoList_App.ToDoList"
-                        f" where ListName = :ListName")
+                        "/* PROC ToDoList_App.ToDoList.SelectOneByListName */"
+                        "select"
+                        "  ID"
+                        ", ListName"
+                        ", ListType"
+                        ", Description"
+                        ", LastUpdated"
+                        " from ToDoList_App.ToDoList"
+                        " where ListName = :ListName")
 
         text_statement = statement.columns(ID=sa.types.Integer,
                                       ListName=db_types.NonNullableString,
@@ -437,41 +502,38 @@ class DB_ToDoListSelectOneByListName:
     @classmethod
     def execute(cls, session: Session, ListName: str
                      ) -> Optional['DB_ToDoListSelectOneByListName']:
-        params = process_bind_params(session, [db_types.NonNullableString,
-                                        ], [ListName,
-                                        ])
+        params = process_bind_params(
+            session,
+            [
+                db_types.NonNullableString,
+            ],
+            [
+                ListName,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         rec = res.fetchone()
         if rec:
             res.close()
-            return process_result_rec(DB_ToDoListSelectOneByListName, session, [sa.types.Integer,
-                                        db_types.NonNullableString,
-                                        DB_ToDoListSelectOneByListName.ListTypeEnum,
-                                        db_types.NonNullableString,
-                                        sa.types.DateTime,
-                                        ], rec)
+            return process_result_rec(
+                DB_ToDoListSelectOneByListName,
+                session,
+                [
+                    sa.types.Integer,
+                    db_types.NonNullableString,
+                    DB_ToDoListSelectOneByListName.ListTypeEnum,
+                    db_types.NonNullableString,
+                    sa.types.DateTime,
+                ],
+                rec,
+            )
 
         return None
 
 @dataclass
 class DB_ToDoListSelectByListType:
     # Enum for ListType field
-    class ListTypeEnum( enum.IntEnum):
-        Private = 1
-        Public = 2
-        Custom = 3
-
-        @classmethod
-        def process_result_value_cls(cls, value, dialect):
-            return DB_ToDoListSelectByListType.ListTypeEnum(value)
-
-        @classmethod
-        def process_bind_param_cls(cls, value, dialect):
-            return value.value
-
-
-    # Enum for ListType field
-    class ListTypeEnum( enum.IntEnum):
+    class ListTypeEnum(enum.IntEnum):
         Private = 1
         Public = 2
         Custom = 3
@@ -503,15 +565,15 @@ class DB_ToDoListSelectByListType:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.ToDoList.SelectByListType */"
-                        f"select"
-                        f"  ID"
-                        f", ListName"
-                        f", ListType"
-                        f", Description"
-                        f", LastUpdated"
-                        f" from ToDoList_App.ToDoList"
-                        f" where ListType = :ListType")
+                        "/* PROC ToDoList_App.ToDoList.SelectByListType */"
+                        "select"
+                        "  ID"
+                        ", ListName"
+                        ", ListType"
+                        ", Description"
+                        ", LastUpdated"
+                        " from ToDoList_App.ToDoList"
+                        " where ListType = :ListType")
 
         text_statement = statement.columns(ID=sa.types.Integer,
                                       ListName=db_types.NonNullableString,
@@ -526,22 +588,34 @@ class DB_ToDoListSelectByListType:
     @classmethod
     def execute(cls, session: Session, ListType: ListTypeEnum
                      ) -> List['DB_ToDoListSelectByListType']:
-        params = process_bind_params(session, [sa.types.SmallInteger,
-                                        ], [ListType.value if isinstance(ListType, enum.IntEnum) else ListType,
-                                        ])
+        params = process_bind_params(
+            session,
+            [
+                sa.types.SmallInteger,
+            ],
+            [
+                ListType.value if isinstance(ListType, enum.IntEnum) else ListType,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         recs = res.fetchall()
-        return process_result_recs(DB_ToDoListSelectByListType, session, [sa.types.Integer,
-                                        db_types.NonNullableString,
-                                        DB_ToDoListSelectByListType.ListTypeEnum,
-                                        db_types.NonNullableString,
-                                        sa.types.DateTime,
-                                        ], recs)
+        return process_result_recs(
+            DB_ToDoListSelectByListType,
+            session,
+            [
+                sa.types.Integer,
+                db_types.NonNullableString,
+                DB_ToDoListSelectByListType.ListTypeEnum,
+                db_types.NonNullableString,
+                sa.types.DateTime,
+            ],
+            recs,
+        )
 
 @dataclass
 class DB_ToDoListSelectIDByListType:
     # Enum for ListType field
-    class ListTypeEnum( enum.IntEnum):
+    class ListTypeEnum(enum.IntEnum):
         Private = 1
         Public = 2
         Custom = 3
@@ -569,11 +643,11 @@ class DB_ToDoListSelectIDByListType:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.ToDoList.SelectIDByListType */"
-                        f"select"
-                        f"  ID"
-                        f" from ToDoList_App.ToDoList"
-                        f" where ListType = :ListType")
+                        "/* PROC ToDoList_App.ToDoList.SelectIDByListType */"
+                        "select"
+                        "  ID"
+                        " from ToDoList_App.ToDoList"
+                        " where ListType = :ListType")
 
         text_statement = statement.columns(ID=sa.types.Integer,
                                       )
@@ -584,13 +658,25 @@ class DB_ToDoListSelectIDByListType:
     @classmethod
     def execute(cls, session: Session, ListType: ListTypeEnum
                      ) -> List['DB_ToDoListSelectIDByListType']:
-        params = process_bind_params(session, [sa.types.SmallInteger,
-                                        ], [ListType.value if isinstance(ListType, enum.IntEnum) else ListType,
-                                        ])
+        params = process_bind_params(
+            session,
+            [
+                sa.types.SmallInteger,
+            ],
+            [
+                ListType.value if isinstance(ListType, enum.IntEnum) else ListType,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         recs = res.fetchall()
-        return process_result_recs(DB_ToDoListSelectIDByListType, session, [sa.types.Integer,
-                                        ], recs)
+        return process_result_recs(
+            DB_ToDoListSelectIDByListType,
+            session,
+            [
+                sa.types.Integer,
+            ],
+            recs,
+        )
 
 @dataclass
 class DB_ToDoListSelectListNameAndListTypeAsString:
@@ -609,17 +695,17 @@ class DB_ToDoListSelectListNameAndListTypeAsString:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.ToDoList.SelectListNameAndListTypeAsString */"
-                        f"SELECT "
-                        f"ListName, "
-                        f"CASE "
-                        f"WHEN ListType = 1 THEN 'Private' "
-                        f"WHEN ListType = 2 THEN 'Public' "
-                        f"END "
-                        f"FROM "
-                        f"TodoList "
-                        f"WHERE "
-                        f"ID = :ID ")
+                        "/* PROC ToDoList_App.ToDoList.SelectListNameAndListTypeAsString */"
+                        "SELECT "
+                        "ListName, "
+                        "CASE "
+                        "WHEN ListType = 1 THEN 'Private' "
+                        "WHEN ListType = 2 THEN 'Public' "
+                        "END "
+                        "FROM "
+                        "TodoList "
+                        "WHERE "
+                        "ID = :ID ")
 
         text_statement = statement.columns(ListName=db_types.NonNullableString,
                                       ListType=db_types.NonNullableString,
@@ -631,19 +717,31 @@ class DB_ToDoListSelectListNameAndListTypeAsString:
     @classmethod
     def execute(cls, session: Session, ID: int
                      ) -> List['DB_ToDoListSelectListNameAndListTypeAsString']:
-        params = process_bind_params(session, [sa.types.Integer,
-                                        ], [ID,
-                                        ])
+        params = process_bind_params(
+            session,
+            [
+                sa.types.Integer,
+            ],
+            [
+                ID,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         recs = res.fetchall()
-        return process_result_recs(DB_ToDoListSelectListNameAndListTypeAsString, session, [db_types.NonNullableString,
-                                        db_types.NonNullableString,
-                                        ], recs)
+        return process_result_recs(
+            DB_ToDoListSelectListNameAndListTypeAsString,
+            session,
+            [
+                db_types.NonNullableString,
+                db_types.NonNullableString,
+            ],
+            recs,
+        )
 
 @dataclass
 class DB_ToDoListSelectWithDynamicQuery:
     # Enum for ListType field
-    class ListTypeEnum( enum.IntEnum):
+    class ListTypeEnum(enum.IntEnum):
         Private = 1
         Public = 2
 
@@ -674,20 +772,20 @@ class DB_ToDoListSelectWithDynamicQuery:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"/* PROC ToDoList_App.ToDoList.SelectWithDynamicQuery */"
-                        f"SELECT "
-                        f"ID "
-                        f",ListName "
-                        f",ListType "
-                        f",Description "
-                        f",LastUpdated "
-                        f"FROM "
-                        f"ToDoList_App.ToDoList "
-                        f"WHERE "
-                        f"ListName = :ListName "
-                        f"AND  "
+                        "/* PROC ToDoList_App.ToDoList.SelectWithDynamicQuery */"
+                        "SELECT "
+                        "ID "
+                        ",ListName "
+                        ",ListType "
+                        ",Description "
+                        ",LastUpdated "
+                        "FROM "
+                        "ToDoList_App.ToDoList "
+                        "WHERE "
+                        "ListName = :ListName "
+                        "AND  "
                         f"{MyDynamicWhereClause}"
-                        f" ")
+                        " ")
 
         text_statement = statement.columns(ID=sa.types.Integer,
                                       ListName=db_types.NonNullableString,
@@ -702,17 +800,31 @@ class DB_ToDoListSelectWithDynamicQuery:
     @classmethod
     def execute(cls, session: Session, ListName: str
                      , MyDynamicWhereClause: str) -> List['DB_ToDoListSelectWithDynamicQuery']:
-        params = process_bind_params(session, [db_types.NonNullableString,
-                                        db_types.NonNullableString,], [ListName,
-                                        MyDynamicWhereClause,])
+        params = process_bind_params(
+            session,
+            [
+                db_types.NonNullableString,
+                db_types.NonNullableString,
+            ],
+            [
+                ListName,
+                MyDynamicWhereClause,
+            ],
+        )
         res = session.execute(cls.get_statement(*params))
         recs = res.fetchall()
-        return process_result_recs(DB_ToDoListSelectWithDynamicQuery, session, [sa.types.Integer,
-                                        db_types.NonNullableString,
-                                        DB_ToDoListSelectWithDynamicQuery.ListTypeEnum,
-                                        db_types.NonNullableString,
-                                        sa.types.DateTime,
-                                        ], recs)
+        return process_result_recs(
+            DB_ToDoListSelectWithDynamicQuery,
+            session,
+            [
+                sa.types.Integer,
+                db_types.NonNullableString,
+                DB_ToDoListSelectWithDynamicQuery.ListTypeEnum,
+                db_types.NonNullableString,
+                sa.types.DateTime,
+            ],
+            recs,
+        )
 
 @dataclass
 class DB_ToDoListStaticData:
@@ -728,7 +840,8 @@ class DB_ToDoListStaticData:
             #session.bind.dialect.name
 
         statement = sa.text(
-                        f"INSERT INTO ToDoList_App.ToDoList(ListName,ListType,Description,LastUpdated) VALUES ('Takeon Test List 1', 1, 'Take on test list description', CURRENT_DATE );")
+                        "INSERT INTO ToDoList_App.ToDoList(ListName,ListType,Description,LastUpdated) VALUES ('Takeon"
+                        " Test List 1', 1, 'Take on test list description', CURRENT_DATE );")
 
         text_statement = statement.columns()
         return text_statement
